@@ -9,7 +9,7 @@
             Spacing="25">
             
             <Label
-                Text="Welcome to &#10;.NET Multi-platform App UI"
+                Text="DONT DISPLAY"
                 Style="{StaticResource SubHeadline}"
                 FontSize="22"
                 HorizontalOptions="Center"
@@ -21,6 +21,27 @@
                 SemanticProperties.Hint="Counts the number of times you click"
                 Clicked="OnCounterClicked"
                 HorizontalOptions="Fill" />
+
+            <Label
+                Text="Time you can break your fast here"
+                Style="{StaticResource SubHeadline}"
+                FontSize="22"
+                HorizontalOptions="Center"
+                x:Name="FastTimeLbl"/>
+
+            <Button
+                x:Name="FastTimerBtn"
+                Text="Fast Timer Click Me" 
+                SemanticProperties.Hint="Fast timer button"
+                Clicked="OnFastTimerButtonClicked"
+                HorizontalOptions="Fill" />
+
+            <Label
+                Text="Fasting Time Left"
+                Style="{StaticResource SubHeadline}"
+                FontSize="22"
+                HorizontalOptions="Center"
+                x:Name="FastTimeLeftLbl"/>
         </VerticalStackLayout>
     </ScrollView>
 
