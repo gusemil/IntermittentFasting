@@ -16,7 +16,7 @@
                 x:Name="TimeNow"/>
 
             <Label
-                Text="Time you can break your fast here"
+                Text="Click to Start Fasting!"
                 Style="{StaticResource SubHeadline}"
                 FontSize="22"
                 HorizontalOptions="Center"
