@@ -66,7 +66,7 @@ namespace IntermittentFasting
             SaveFastTime(timeWhenFastCanBeBroken);
             isFastinProgress = true;
 
-            CreateNotification();
+            CreateFastOverNotification(false);
         }
 
         private void SetStartFastTexts()
@@ -100,27 +100,57 @@ namespace IntermittentFasting
             isFastinProgress = false;
         }
 
-        private void CreateNotification()
+        private void CreateFastOverNotification(bool isRepeating)
         {
             NotificationRequest request = new NotificationRequest()
             {
                 NotificationId = 1337,
                 Title = "Fast over!",
                 Subtitle = "You can now break your fast!",
-                Description = "Faaaaast!",
-                BadgeNumber = 69, //What is this?
+                //Description = "You can now break you!",
                 CategoryType = NotificationCategoryType.Reminder,
                 Schedule = new NotificationRequestSchedule()
                 {
                     NotifyTime = DateTime.Now.AddSeconds(intermittentFastingPeriod),
-                    NotifyRepeatInterval = TimeSpan.FromDays(1),
-                    RepeatType = NotificationRepeat.Daily, //Necessary?
                 },
                 Android = new AndroidOptions
                 {
                     LaunchAppWhenTapped = true
                 }
             };
+
+            if (isRepeating)
+            {
+                request.Schedule.NotifyRepeatInterval = TimeSpan.FromDays(1);
+                request.Schedule.RepeatType = NotificationRepeat.Daily;
+            }
+
+            LocalNotificationCenter.Current.Show(request);
+        }
+
+        private void CreateStartFastNotification(bool isRepeating)
+        {
+            NotificationRequest request = new NotificationRequest()
+            {
+                NotificationId = 1338,
+                Title = "Fast is starting!",
+                Subtitle = "Don't eat until: " + timeWhenFastCanBeBroken,
+                CategoryType = NotificationCategoryType.Reminder,
+                Schedule = new NotificationRequestSchedule()
+                {
+                    NotifyTime = DateTime.Now.AddSeconds(intermittentFastingPeriod),
+                },
+                Android = new AndroidOptions
+                {
+                    LaunchAppWhenTapped = true
+                }
+            };
+
+            if (isRepeating)
+            {
+                request.Schedule.NotifyRepeatInterval = TimeSpan.FromDays(1);
+                request.Schedule.RepeatType = NotificationRepeat.Daily;
+            }
 
             LocalNotificationCenter.Current.Show(request);
         }
