@@ -5,8 +5,7 @@ namespace IntermittentFasting
 {
     public partial class MainPage : ContentPage
     {
-        //private const int intermittentFastingPeriod = 57600; //57600 seconds -> 16 hours
-        private const int intermittentFastingPeriod = 5;
+        private const int intermittentFastingPeriod = 57600; //57600 seconds -> 16 hours
         private DateTime timeWhenFastCanBeBroken;
         private const string fastTimeKey = "timeKey";
         private bool isFastinProgress = false;
@@ -19,9 +18,6 @@ namespace IntermittentFasting
             this.Loaded += CurrentTime;
 
             timeWhenFastCanBeBroken = GetFastTime();
-
-            //For testing only
-            CreateNotification();
 
             if (DateTime.Now > timeWhenFastCanBeBroken)
             {
@@ -69,6 +65,8 @@ namespace IntermittentFasting
             Application.Current.MainPage.DisplayAlert("", "Fast Started! Fast can be broken " + timeWhenFastCanBeBroken.ToString("T"), "Start Fasting!");
             SaveFastTime(timeWhenFastCanBeBroken);
             isFastinProgress = true;
+
+            CreateNotification();
         }
 
         private void SetStartFastTexts()
@@ -114,7 +112,7 @@ namespace IntermittentFasting
                 CategoryType = NotificationCategoryType.Reminder,
                 Schedule = new NotificationRequestSchedule()
                 {
-                    NotifyTime = DateTime.Now.AddSeconds(5),
+                    NotifyTime = DateTime.Now.AddSeconds(intermittentFastingPeriod),
                     NotifyRepeatInterval = TimeSpan.FromDays(1),
                     RepeatType = NotificationRepeat.Daily, //Necessary?
                 },
