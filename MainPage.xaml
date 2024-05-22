@@ -7,20 +7,13 @@
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
-            
+
             <Label
                 Text="DONT DISPLAY"
                 Style="{StaticResource SubHeadline}"
                 FontSize="22"
                 HorizontalOptions="Center"
                 x:Name="TimeNow"/>
-
-            <Button
-                x:Name="CounterBtn"
-                Text="Click me" 
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
-                HorizontalOptions="Fill" />
 
             <Label
                 Text="Time you can break your fast here"
@@ -31,17 +24,10 @@
 
             <Button
                 x:Name="FastTimerBtn"
-                Text="Fast Timer Click Me" 
-                SemanticProperties.Hint="Fast timer button"
-                Clicked="OnFastTimerButtonClicked"
+                Text="Click to Start Fast" 
+                SemanticProperties.Hint="Start/Reset fast"
+                Clicked="OnFastButtonClicked"
                 HorizontalOptions="Fill" />
-
-            <Label
-                Text="Fasting Time Left"
-                Style="{StaticResource SubHeadline}"
-                FontSize="22"
-                HorizontalOptions="Center"
-                x:Name="FastTimeLeftLbl"/>
         </VerticalStackLayout>
     </ScrollView>
 
