@@ -1,4 +1,5 @@
-﻿using System.Timers;
+﻿using Plugin.LocalNotification;
+using Plugin.LocalNotification.AndroidOption;
 
 namespace IntermittentFasting
 {
@@ -9,6 +10,7 @@ namespace IntermittentFasting
         private DateTime timeWhenFastCanBeBroken;
         private const string fastTimeKey = "timeKey";
         private bool isFastinProgress = false;
+        private LocalNotificationCenter currentNotification;
 
         public MainPage()
         {
@@ -17,6 +19,9 @@ namespace IntermittentFasting
             this.Loaded += CurrentTime;
 
             timeWhenFastCanBeBroken = GetFastTime();
+
+            //For testing only
+            CreateNotification();
 
             if (DateTime.Now > timeWhenFastCanBeBroken)
             {
@@ -95,6 +100,31 @@ namespace IntermittentFasting
 
             SetResetFastTexts();
             isFastinProgress = false;
+        }
+
+        private void CreateNotification()
+        {
+            NotificationRequest request = new NotificationRequest()
+            {
+                NotificationId = 1337,
+                Title = "Fast over!",
+                Subtitle = "You can now break your fast!",
+                Description = "Faaaaast!",
+                BadgeNumber = 69, //What is this?
+                CategoryType = NotificationCategoryType.Reminder,
+                Schedule = new NotificationRequestSchedule()
+                {
+                    NotifyTime = DateTime.Now.AddSeconds(5),
+                    NotifyRepeatInterval = TimeSpan.FromDays(1),
+                    RepeatType = NotificationRepeat.Daily, //Necessary?
+                },
+                Android = new AndroidOptions
+                {
+                    LaunchAppWhenTapped = true
+                }
+            };
+
+            LocalNotificationCenter.Current.Show(request);
         }
 
     }
