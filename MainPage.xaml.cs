@@ -14,6 +14,7 @@ namespace IntermittentFasting
         public MainPage()
         {
             InitializeComponent();
+            TimeNowLbl.Text = DateTime.Now.ToString("T");
 
             this.Loaded += CurrentTime;
 
@@ -44,7 +45,14 @@ namespace IntermittentFasting
 
         private void CheckTime()
         {
-            TimeNow.Text = "Current Time: " + DateTime.Now.ToString("T");
+            if(isFastinProgress) 
+            {
+                TimeNowLbl.Text = "Fasting Time Left: " + ((DateTime.Now - timeWhenFastCanBeBroken) * -1).ToString("T");
+            }
+            else
+            {
+                TimeNowLbl.Text = "Current Time: " + DateTime.Now.ToString("T");
+            }
             if(DateTime.Now > timeWhenFastCanBeBroken)
             {
                 ResetFast();
