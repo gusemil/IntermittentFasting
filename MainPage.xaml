@@ -28,6 +28,13 @@
                 SemanticProperties.Hint="Start/Reset fast"
                 Clicked="OnFastButtonClicked"
                 HorizontalOptions="Fill" />
+
+            <Button
+                x:Name="BreakFastBtn"
+                Text="Click to Break Fast" 
+                SemanticProperties.Hint="Break fast"
+                Clicked="OnBreakFastButtonClicked"
+                HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>
 
