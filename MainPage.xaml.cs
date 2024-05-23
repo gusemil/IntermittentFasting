@@ -68,7 +68,7 @@ namespace IntermittentFasting
             {
                 TimeNowLbl.Text = "Current Time: " + DateTime.Now.ToString("T");
             }
-            if(DateTime.Now > timeWhenFastCanBeBroken)
+            if(DateTime.Now > timeWhenFastCanBeBroken && !isEatingWindowInProgress)
             {
                 ResetFast();
             }
@@ -200,6 +200,8 @@ namespace IntermittentFasting
             LocalNotificationCenter.Current.Show(request);
         }
 
+        //TODO: One hour left notification
+
         private void CreateEatingWindowOverNotification(bool isRepeating)
         {
             NotificationRequest request = new NotificationRequest()
@@ -227,6 +229,8 @@ namespace IntermittentFasting
 
             LocalNotificationCenter.Current.Show(request);
         }
+
+        //TODO: One hour left notification
 
         private void CreateStartFastNotification(bool isRepeating)
         {
