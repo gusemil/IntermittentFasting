@@ -18,7 +18,7 @@ namespace IntermittentFasting
         public MainPage()
         {
             InitializeComponent();
-            TimeNowLbl.Text = DateTime.Now.ToString("T");
+            TimeNowLbl.Text = TimeNowLbl.Text = "Current Time: " + DateTime.Now.ToString("T");
 
             this.Loaded += CurrentTime;
 
@@ -29,7 +29,7 @@ namespace IntermittentFasting
             {
                 ResetFast();
             } 
-            else if(!isEatingWindowInProgress)
+            else if(!isEatingWindowInProgress || timeWhenFastCanBeBroken.Second < 0)
             {
                 isFastInProgress = true;
                 SetStartFastTexts();
@@ -39,9 +39,11 @@ namespace IntermittentFasting
             {
                 ResetBreakFastTime();
             }
-            else if (!isFastInProgress)
+            else if (!isFastInProgress || timeWhenEatingWindowEnds.Second > 0)
             {
                 isEatingWindowInProgress = true;
+                FastTimeLbl.Text = "Eating window ends: " + timeWhenEatingWindowEnds.ToString("T");
+                BreakFastBtn.Text = "Click to end eating window";
             }
         }
 
@@ -59,7 +61,7 @@ namespace IntermittentFasting
 
         private void CheckTime()
         {
-            if(isFastInProgress) 
+            if(isFastInProgress && ((DateTime.Now - timeWhenFastCanBeBroken).TotalSeconds < 0)) 
             {
                 //TimeNowLbl.Text = "Fasting Time Left: " + ((DateTime.Now - timeWhenFastCanBeBroken) * -1).ToString("HH:mm:ss");
                 TimeNowLbl.Text = "Fasting Time Left: " + ((DateTime.Now - timeWhenFastCanBeBroken) * -1).ToString("T");
@@ -76,7 +78,13 @@ namespace IntermittentFasting
 
         private void OnFastButtonClicked(object sender, EventArgs e)
         {
-            if(isFastInProgress)
+            if (isEatingWindowInProgress)
+            {
+                ResetBreakFastTime();
+                Application.Current.MainPage.DisplayAlert("", "Eating window has been reset!", "Ok");
+                return;
+            }
+            else if(isFastInProgress)
             {
                 ResetFast();
                 Application.Current.MainPage.DisplayAlert("", "Fast has been reset!", "Start Fasting!");
