@@ -1,4 +1,5 @@
-﻿using Plugin.LocalNotification;
+﻿using Microsoft.Maui.Graphics.Text;
+using Plugin.LocalNotification;
 using Plugin.LocalNotification.AndroidOption;
 using System.Threading.Channels;
 
@@ -6,8 +7,10 @@ namespace IntermittentFasting
 {
     public partial class MainPage : ContentPage
     {
-        private const int intermittentFastingPeriod = 57600; //57600 seconds -> 16 hours
-        private const int eatingWindowPeriod = 28800; //28800 seconds -> 8 hours
+        private const int defaultIntermittentFastingPeriod = 57600; //57600 seconds -> 16 hours
+        private const int defaultEatingWindowPeriod = 28800; //28800 seconds -> 8 hours
+        private int intermittentFastingPeriod = 56600;
+        private int eatingWindowPeriod = 28800;
         private DateTime timeWhenFastCanBeBroken;
         private DateTime timeWhenEatingWindowEnds;
         private const string fastTimeKey = "fastTimeKey";
@@ -17,6 +20,8 @@ namespace IntermittentFasting
         private bool isEatingWindowInProgress = false;
         private const string notificationToggleKey = "notificationToggleKey";
         private bool isNotificationsToggleOn = true;
+        private const int minHours = 1;
+        private const int maxHours = 23;
 
         public MainPage()
         {
@@ -108,7 +113,7 @@ namespace IntermittentFasting
                 return;
             }
 
-            timeWhenFastCanBeBroken = DateTime.Now.AddSeconds(intermittentFastingPeriod);
+            timeWhenFastCanBeBroken = DateTime.Now.AddSeconds(defaultIntermittentFastingPeriod);
             SetStartFastTexts();
             DisplayAlertNotification("", "Fast Started! Fast can be broken " + timeWhenFastCanBeBroken.ToString("T"), "Start Fasting!");
             SaveFastTime(timeWhenFastCanBeBroken);
@@ -119,10 +124,7 @@ namespace IntermittentFasting
 
         private void DisplayAlertNotification(string title, string message, string cancel)
         {
-            if (isNotificationsToggleOn)
-            {
                 Application.Current.MainPage.DisplayAlert(title, message, cancel);
-            }
         }
 
         private void OnBreakFastButtonClicked(object sender, EventArgs e)
@@ -140,7 +142,7 @@ namespace IntermittentFasting
                 return;
             }
 
-            timeWhenEatingWindowEnds = DateTime.Now.AddSeconds(eatingWindowPeriod);
+            timeWhenEatingWindowEnds = DateTime.Now.AddSeconds(defaultEatingWindowPeriod);
             //SetStartEatingWindowTexts();
             FastTimeLbl.Text = "Eating window ends: " + timeWhenEatingWindowEnds.ToString("T");
             BreakFastBtn.Text = "Click to end eating window";
@@ -226,6 +228,8 @@ namespace IntermittentFasting
 
         private void CreateReminderNotification(string title, string subtitle, int notificationId, bool isRepeating)
         {
+            if (!isNotificationsToggleOn) return;
+
             NotificationRequest request = new NotificationRequest()
             {
                 NotificationId = notificationId,
@@ -235,7 +239,7 @@ namespace IntermittentFasting
                 CategoryType = NotificationCategoryType.Reminder,
                 Schedule = new NotificationRequestSchedule()
                 {
-                    NotifyTime = DateTime.Now.AddSeconds(intermittentFastingPeriod),
+                    NotifyTime = DateTime.Now.AddSeconds(defaultIntermittentFastingPeriod),
                 },
                 Android = new AndroidOptions
                 {
@@ -251,7 +255,35 @@ namespace IntermittentFasting
 
             LocalNotificationCenter.Current.Show(request);
         }
+
         //TODO: One hour left notification
+
+        private void OnCustomizeFastBtnClicked(object sender, EventArgs e)
+        {
+            int fastHours = Int32.Parse(FastHoursEntry.Text);
+            int eatHours = Int32.Parse(EatHoursEntry.Text);
+
+            if(fastHours < minHours && fastHours > maxHours)
+            {
+                //TODO: notify user of invalid fast hour input
+                return;
+            }
+
+            if(eatHours < minHours && eatHours > maxHours)
+            {
+                //TODO: notify user of invalid eat hour input
+                return;
+            }
+
+            if ((fastHours + eatHours) != 24)
+            {
+                //TODO: Invalid amount of hours in a day
+                return;
+            }
+
+            intermittentFastingPeriod = fastHours;
+            eatingWindowPeriod = eatHours;
+        }
     }
 
 }
