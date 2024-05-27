@@ -103,26 +103,26 @@ namespace IntermittentFasting
             if (isEatingWindowInProgress)
             {
                 ResetBreakFastTime();
-                DisplayAlertNotification("", "Eating window has been reset!", "Ok");
+                DisplayAlertDialog("", "Eating window has been reset!", "Ok");
                 return;
             }
             else if(isFastInProgress)
             {
                 ResetFast();
-                DisplayAlertNotification("", "Fast has been reset!", "Start Fasting!");
+                DisplayAlertDialog("", "Fast has been reset!", "Start Fasting!");
                 return;
             }
 
             timeWhenFastCanBeBroken = DateTime.Now.AddSeconds(defaultIntermittentFastingPeriod);
             SetStartFastTexts();
-            DisplayAlertNotification("", "Fast Started! Fast can be broken " + timeWhenFastCanBeBroken.ToString("T"), "Start Fasting!");
+            DisplayAlertDialog("", "Fast Started! Fast can be broken " + timeWhenFastCanBeBroken.ToString("T"), "Start Fasting!");
             SaveFastTime(timeWhenFastCanBeBroken);
             isFastInProgress = true;
 
             CreateReminderNotification("Fast over!", "You can now break your fast!", 1337, false);
         }
 
-        private void DisplayAlertNotification(string title, string message, string cancel)
+        private void DisplayAlertDialog(string title, string message, string cancel)
         {
                 Application.Current.MainPage.DisplayAlert(title, message, cancel);
         }
@@ -132,13 +132,13 @@ namespace IntermittentFasting
             if (isFastInProgress)
             {
                 ResetFast();
-                DisplayAlertNotification("", "Fast has been reset!", "Start Fasting!");
+                DisplayAlertDialog("", "Fast has been reset!", "Start Fasting!");
                 return;
             }
             else if (isEatingWindowInProgress)
             {
                 ResetBreakFastTime();
-                DisplayAlertNotification("", "Eating window has been reset!", "Ok");
+                DisplayAlertDialog("", "Eating window has been reset!", "Ok");
                 return;
             }
 
@@ -147,7 +147,7 @@ namespace IntermittentFasting
             FastTimeLbl.Text = "Eating window ends: " + timeWhenEatingWindowEnds.ToString("T");
             BreakFastBtn.Text = "Click to end eating window";
 
-            DisplayAlertNotification("", "Fast broken! Eating window ends " + timeWhenEatingWindowEnds.ToString("T"), "Start Eating!");
+            DisplayAlertDialog("", "Fast broken! Eating window ends " + timeWhenEatingWindowEnds.ToString("T"), "Start Eating!");
             SaveBreakFastTime(timeWhenEatingWindowEnds);
             isEatingWindowInProgress = true;
 
@@ -263,21 +263,21 @@ namespace IntermittentFasting
             int fastHours = Int32.Parse(FastHoursEntry.Text);
             int eatHours = Int32.Parse(EatHoursEntry.Text);
 
-            if(fastHours < minHours && fastHours > maxHours)
+            if (fastHours <= 0)
             {
-                //TODO: notify user of invalid fast hour input
+                DisplayAlertDialog("","Invalid Fasting hours input","Ok");
                 return;
             }
 
-            if(eatHours < minHours && eatHours > maxHours)
+            if(eatHours <= 0)
             {
-                //TODO: notify user of invalid eat hour input
+                DisplayAlertDialog("", "Invalid Eating period input", "Ok");
                 return;
             }
 
             if ((fastHours + eatHours) != 24)
             {
-                //TODO: Invalid amount of hours in a day
+                DisplayAlertDialog("", "Invalid hours in a day inserted", "Ok");
                 return;
             }
 
