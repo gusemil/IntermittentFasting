@@ -286,34 +286,6 @@ namespace IntermittentFasting
         }
 
         //TODO: One hour left notification
-
-        private void CreateStartFastNotification(bool isRepeating)
-        {
-            NotificationRequest request = new NotificationRequest()
-            {
-                NotificationId = 1337,
-                Title = "Fast is starting!",
-                Subtitle = "Don't eat until: " + timeWhenFastCanBeBroken,
-                CategoryType = NotificationCategoryType.Reminder,
-                Schedule = new NotificationRequestSchedule()
-                {
-                    NotifyTime = DateTime.Now.AddSeconds(intermittentFastingPeriod),
-                },
-                Android = new AndroidOptions
-                {
-                    LaunchAppWhenTapped = true
-                }
-            };
-
-            if (isRepeating)
-            {
-                request.Schedule.NotifyRepeatInterval = TimeSpan.FromDays(1);
-                request.Schedule.RepeatType = NotificationRepeat.Daily;
-            }
-
-            LocalNotificationCenter.Current.Show(request);
-        }
-
     }
 
 }
