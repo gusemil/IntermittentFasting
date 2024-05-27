@@ -13,7 +13,7 @@ namespace IntermittentFasting
         private const string breakFastTimeKey = "breakFastTimeKey";
         private bool isFastInProgress = false;
         private bool isEatingWindowInProgress = false;
-        private LocalNotificationCenter currentNotification;
+        private int currentFastOrEatingWindowNotificationId;
 
         public MainPage()
         {
@@ -157,6 +157,13 @@ namespace IntermittentFasting
 
             SetResetFastTexts();
             isFastInProgress = false;
+
+            CancelNotification(currentFastOrEatingWindowNotificationId);
+        }
+        
+        private void CancelNotification(int id)
+        {
+            LocalNotificationCenter.Current.Cancel(id);
         }
 
         private void SaveBreakFastTime(DateTime fastTime)
@@ -178,6 +185,8 @@ namespace IntermittentFasting
             isEatingWindowInProgress = false;
             FastTimeLbl.Text = "Click to break fast";
             BreakFastBtn.Text = "Click to end fast";
+
+            CancelNotification(currentFastOrEatingWindowNotificationId);
         }
 
         private void CreateFastOverNotification(bool isRepeating)
@@ -206,6 +215,7 @@ namespace IntermittentFasting
             }
 
             LocalNotificationCenter.Current.Show(request);
+            currentFastOrEatingWindowNotificationId = request.NotificationId;
         }
 
         //TODO: One hour left notification
@@ -235,7 +245,8 @@ namespace IntermittentFasting
                 request.Schedule.RepeatType = NotificationRepeat.Daily;
             }
 
-            LocalNotificationCenter.Current.Show(request);
+            var test = LocalNotificationCenter.Current.Show(request);
+            currentFastOrEatingWindowNotificationId = request.NotificationId;
         }
 
         //TODO: One hour left notification
