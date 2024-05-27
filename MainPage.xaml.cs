@@ -12,9 +12,9 @@ namespace IntermittentFasting
         private DateTime timeWhenEatingWindowEnds;
         private const string fastTimeKey = "fastTimeKey";
         private const string breakFastTimeKey = "breakFastTimeKey";
+        private const int fastOrEatingWindowNotificationId = 1337;
         private bool isFastInProgress = false;
         private bool isEatingWindowInProgress = false;
-        private int currentFastOrEatingWindowNotificationId;
         private const string notificationToggleKey = "notificationToggleKey";
         private bool isNotificationsToggleOn = true;
 
@@ -114,7 +114,7 @@ namespace IntermittentFasting
             SaveFastTime(timeWhenFastCanBeBroken);
             isFastInProgress = true;
 
-            CreateFastOverNotification(false);
+            CreateReminderNotification("Fast over!", "You can now break your fast!", 1337, false);
         }
 
         private void DisplayAlertNotification(string title, string message, string cancel)
@@ -149,8 +149,7 @@ namespace IntermittentFasting
             SaveBreakFastTime(timeWhenEatingWindowEnds);
             isEatingWindowInProgress = true;
 
-            CreateEatingWindowOverNotification(false);
-
+            CreateReminderNotification("Eating window over", "Start fasting!", fastOrEatingWindowNotificationId, false);
         }
 
         private void SetStartFastTexts()
@@ -183,7 +182,7 @@ namespace IntermittentFasting
             SetResetFastTexts();
             isFastInProgress = false;
 
-            CancelNotification(currentFastOrEatingWindowNotificationId);
+            CancelNotification(fastOrEatingWindowNotificationId);
         }
         
         private void CancelNotification(int id)
@@ -222,16 +221,16 @@ namespace IntermittentFasting
             FastTimeLbl.Text = "Click to break fast";
             BreakFastBtn.Text = "Click to end fast";
 
-            CancelNotification(currentFastOrEatingWindowNotificationId);
+            CancelNotification(fastOrEatingWindowNotificationId);
         }
 
-        private void CreateFastOverNotification(bool isRepeating)
+        private void CreateReminderNotification(string title, string subtitle, int notificationId, bool isRepeating)
         {
             NotificationRequest request = new NotificationRequest()
             {
-                NotificationId = 1337,
-                Title = "Fast over!",
-                Subtitle = "You can now break your fast!",
+                NotificationId = notificationId,
+                Title = title,
+                Subtitle = subtitle,
                 //Description = "You can now break your fast!",
                 CategoryType = NotificationCategoryType.Reminder,
                 Schedule = new NotificationRequestSchedule()
@@ -251,40 +250,7 @@ namespace IntermittentFasting
             }
 
             LocalNotificationCenter.Current.Show(request);
-            currentFastOrEatingWindowNotificationId = request.NotificationId;
         }
-
-        //TODO: One hour left notification
-
-        private void CreateEatingWindowOverNotification(bool isRepeating)
-        {
-            NotificationRequest request = new NotificationRequest()
-            {
-                NotificationId = 1337,
-                Title = "Eating window over",
-                Subtitle = "Start fasting!",
-                //Description = "You can now break your fast!",
-                CategoryType = NotificationCategoryType.Reminder,
-                Schedule = new NotificationRequestSchedule()
-                {
-                    NotifyTime = DateTime.Now.AddSeconds(eatingWindowPeriod),
-                },
-                Android = new AndroidOptions
-                {
-                    LaunchAppWhenTapped = true
-                }
-            };
-
-            if (isRepeating)
-            {
-                request.Schedule.NotifyRepeatInterval = TimeSpan.FromDays(1);
-                request.Schedule.RepeatType = NotificationRepeat.Daily;
-            }
-
-            LocalNotificationCenter.Current.Show(request);
-            currentFastOrEatingWindowNotificationId = request.NotificationId;
-        }
-
         //TODO: One hour left notification
     }
 
