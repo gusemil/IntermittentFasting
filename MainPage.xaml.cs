@@ -1,5 +1,6 @@
 ﻿using Plugin.LocalNotification;
 using Plugin.LocalNotification.AndroidOption;
+using System.Threading.Channels;
 
 namespace IntermittentFasting
 {
@@ -14,6 +15,8 @@ namespace IntermittentFasting
         private bool isFastInProgress = false;
         private bool isEatingWindowInProgress = false;
         private int currentFastOrEatingWindowNotificationId;
+        private const string notificationToggleKey = "notificationToggleKey";
+        private bool isNotificationsToggleOn = true;
 
         public MainPage()
         {
@@ -24,6 +27,10 @@ namespace IntermittentFasting
 
             timeWhenFastCanBeBroken = GetFastTime();
             timeWhenEatingWindowEnds = GetBreakFastTime();
+
+            isNotificationsToggleOn = GetNotificationToggleState();
+
+            ToggleNotificationSwitch.IsToggled = isNotificationsToggleOn;
 
             if (DateTime.Now > timeWhenFastCanBeBroken && isFastInProgress)
             {
@@ -45,6 +52,12 @@ namespace IntermittentFasting
                 FastTimeLbl.Text = "Eating window ends: " + timeWhenEatingWindowEnds.ToString("T");
                 BreakFastBtn.Text = "Click to end eating window";
             }
+        }
+
+        private void OnNotificationsToggled(object sender, EventArgs e)
+        {
+            isNotificationsToggleOn = ToggleNotificationSwitch.IsToggled;
+            SaveNotificationToggleState();
         }
 
 
@@ -81,23 +94,31 @@ namespace IntermittentFasting
             if (isEatingWindowInProgress)
             {
                 ResetBreakFastTime();
-                Application.Current.MainPage.DisplayAlert("", "Eating window has been reset!", "Ok");
+                DisplayAlertNotification("", "Eating window has been reset!", "Ok");
                 return;
             }
             else if(isFastInProgress)
             {
                 ResetFast();
-                Application.Current.MainPage.DisplayAlert("", "Fast has been reset!", "Start Fasting!");
+                DisplayAlertNotification("", "Fast has been reset!", "Start Fasting!");
                 return;
             }
 
             timeWhenFastCanBeBroken = DateTime.Now.AddSeconds(intermittentFastingPeriod);
             SetStartFastTexts();
-            Application.Current.MainPage.DisplayAlert("", "Fast Started! Fast can be broken " + timeWhenFastCanBeBroken.ToString("T"), "Start Fasting!");
+            DisplayAlertNotification("", "Fast Started! Fast can be broken " + timeWhenFastCanBeBroken.ToString("T"), "Start Fasting!");
             SaveFastTime(timeWhenFastCanBeBroken);
             isFastInProgress = true;
 
             CreateFastOverNotification(false);
+        }
+
+        private void DisplayAlertNotification(string title, string message, string cancel)
+        {
+            if (isNotificationsToggleOn)
+            {
+                Application.Current.MainPage.DisplayAlert(title, message, cancel);
+            }
         }
 
         private void OnBreakFastButtonClicked(object sender, EventArgs e)
@@ -105,13 +126,13 @@ namespace IntermittentFasting
             if (isFastInProgress)
             {
                 ResetFast();
-                Application.Current.MainPage.DisplayAlert("", "Fast has been reset!", "Start Fasting!");
+                DisplayAlertNotification("", "Fast has been reset!", "Start Fasting!");
                 return;
             }
             else if (isEatingWindowInProgress)
             {
                 ResetBreakFastTime();
-                Application.Current.MainPage.DisplayAlert("", "Eating window has been reset!", "Ok");
+                DisplayAlertNotification("", "Eating window has been reset!", "Ok");
                 return;
             }
 
@@ -120,7 +141,7 @@ namespace IntermittentFasting
             FastTimeLbl.Text = "Eating window ends: " + timeWhenEatingWindowEnds.ToString("T");
             BreakFastBtn.Text = "Click to end eating window";
 
-            Application.Current.MainPage.DisplayAlert("", "Fast broken! Eating window ends " + timeWhenEatingWindowEnds.ToString("T"), "Start Eating!");
+            DisplayAlertNotification("", "Fast broken! Eating window ends " + timeWhenEatingWindowEnds.ToString("T"), "Start Eating!");
             SaveBreakFastTime(timeWhenEatingWindowEnds);
             isEatingWindowInProgress = true;
 
@@ -164,6 +185,17 @@ namespace IntermittentFasting
         private void CancelNotification(int id)
         {
             LocalNotificationCenter.Current.Cancel(id);
+        }
+
+        private void SaveNotificationToggleState()
+        {
+            Preferences.Default.Set(notificationToggleKey, isNotificationsToggleOn);
+        }
+
+        private bool GetNotificationToggleState()
+        {
+            bool state = Preferences.Default.Get(notificationToggleKey, isNotificationsToggleOn);
+            return state;
         }
 
         private void SaveBreakFastTime(DateTime fastTime)
@@ -245,7 +277,7 @@ namespace IntermittentFasting
                 request.Schedule.RepeatType = NotificationRepeat.Daily;
             }
 
-            var test = LocalNotificationCenter.Current.Show(request);
+            LocalNotificationCenter.Current.Show(request);
             currentFastOrEatingWindowNotificationId = request.NotificationId;
         }
 

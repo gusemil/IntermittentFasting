@@ -8,6 +8,22 @@
             Padding="30,0"
             Spacing="25">
 
+            <HorizontalStackLayout
+                Padding="30,0"
+                Spacing="25">
+                
+                <Label
+                Text="Notifications"
+                Style="{StaticResource SubHeadline}"
+                FontSize="22"
+                HorizontalOptions="Center"
+                x:Name="ToggleNotificationLbl"/>
+
+                <Switch
+                 Toggled="OnNotificationsToggled"
+                 x:Name="ToggleNotificationSwitch"/>
+            </HorizontalStackLayout>
+
             <Label
                 Text=""
                 Style="{StaticResource SubHeadline}"
