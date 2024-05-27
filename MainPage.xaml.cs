@@ -76,16 +76,20 @@ namespace IntermittentFasting
         {
             if(isFastInProgress && ((DateTime.Now - timeWhenFastCanBeBroken).TotalSeconds < 0)) 
             {
-                //TimeNowLbl.Text = "Fasting Time Left: " + ((DateTime.Now - timeWhenFastCanBeBroken) * -1).ToString("HH:mm:ss");
                 TimeNowLbl.Text = "Fasting Time Left: " + ((DateTime.Now - timeWhenFastCanBeBroken) * -1).ToString("T");
             }
-            else
+            else if (isEatingWindowInProgress && ((DateTime.Now - timeWhenEatingWindowEnds).TotalSeconds < 0))
             {
-                TimeNowLbl.Text = "Current Time: " + DateTime.Now.ToString("T");
+                TimeNowLbl.Text = "Eating time Left: " + ((DateTime.Now - timeWhenEatingWindowEnds) * -1).ToString("T");
             }
+
             if(DateTime.Now > timeWhenFastCanBeBroken && !isEatingWindowInProgress)
             {
                 ResetFast();
+            }
+            else if(DateTime.Now > timeWhenEatingWindowEnds && !isFastInProgress)
+            {
+                ResetBreakFastTime();
             }
         }
 
