@@ -7,19 +7,19 @@ namespace IntermittentFasting
     {
         private const int defaultIntermittentFastingPeriod = 57600; //57600 seconds -> 16 hours
         private const int defaultEatingWindowPeriod = 28800; //28800 seconds -> 8 hours
-        private int intermittentFastingPeriod = 56600;
-        private int eatingWindowPeriod = 28800;
+        private const int oneHourInSeconds = 3600;
+        private int intermittentFastingPeriod = defaultIntermittentFastingPeriod;
+        private int eatingWindowPeriod = defaultEatingWindowPeriod;
         private DateTime timeWhenFastCanBeBroken;
         private DateTime timeWhenEatingWindowEnds;
         private const string fastTimeKey = "fastTimeKey";
         private const string breakFastTimeKey = "breakFastTimeKey";
         private const int fastOrEatingWindowNotificationId = 1337;
+        private const int oneHourLeftNotificationId = 420;
         private bool isFastInProgress = false;
         private bool isEatingWindowInProgress = false;
         private const string notificationToggleKey = "notificationToggleKey";
         private bool isNotificationsToggleOn = true;
-        private const int minHours = 1;
-        private const int maxHours = 23;
         private const string customFastingPeriodKey = "customFastingPeriodKey";
         private const string customEatingWindowPeriodKey = "customEatingWindowPeriodKey";
 
@@ -33,8 +33,8 @@ namespace IntermittentFasting
             intermittentFastingPeriod = GetCustomFastingPeriod();
             eatingWindowPeriod = GetCustomEatingWindowPeriod();
 
-            FastHoursEntry.Text = (intermittentFastingPeriod / 3600).ToString();
-            EatHoursEntry.Text = (eatingWindowPeriod / 3600).ToString();
+            FastHoursEntry.Text = (intermittentFastingPeriod / oneHourInSeconds).ToString();
+            EatHoursEntry.Text = (eatingWindowPeriod / oneHourInSeconds).ToString();
 
             isNotificationsToggleOn = GetNotificationToggleState();
 
@@ -124,12 +124,13 @@ namespace IntermittentFasting
             SaveFastTime(timeWhenFastCanBeBroken);
             isFastInProgress = true;
 
-            CreateReminderNotification("Fast over!", "You can now break your fast!", 1337, intermittentFastingPeriod, false);
+            CreateReminderNotification("Fast can be broken in one hour", "1 hour left!", oneHourLeftNotificationId, intermittentFastingPeriod - oneHourInSeconds, false);
+            CreateReminderNotification("Fast over!", "You can now break your fast!", fastOrEatingWindowNotificationId, intermittentFastingPeriod, false);
         }
 
         private void DisplayAlertDialog(string title, string message, string cancel)
         {
-                Application.Current.MainPage.DisplayAlert(title, message, cancel);
+            Application.Current.MainPage.DisplayAlert(title, message, cancel);
         }
 
         private void OnBreakFastButtonClicked(object sender, EventArgs e)
@@ -156,6 +157,7 @@ namespace IntermittentFasting
             SaveBreakFastTime(timeWhenEatingWindowEnds);
             isEatingWindowInProgress = true;
 
+            CreateReminderNotification("Eating window is over in one hour", "1 hour left!", oneHourLeftNotificationId, eatingWindowPeriod - oneHourInSeconds, false);
             CreateReminderNotification("Eating window over", "Start fasting!", fastOrEatingWindowNotificationId, eatingWindowPeriod, false);
         }
 
@@ -190,6 +192,7 @@ namespace IntermittentFasting
             isFastInProgress = false;
 
             CancelNotification(fastOrEatingWindowNotificationId);
+            CancelNotification(oneHourLeftNotificationId);
         }
         
         private void CancelNotification(int id)
@@ -228,6 +231,7 @@ namespace IntermittentFasting
             FastTimeLbl.Text = "Click to break fast";
             BreakFastBtn.Text = "Click to end fast";
 
+            CancelNotification(oneHourLeftNotificationId);
             CancelNotification(fastOrEatingWindowNotificationId);
         }
 
@@ -261,8 +265,6 @@ namespace IntermittentFasting
             LocalNotificationCenter.Current.Show(request);
         }
 
-        //TODO: One hour left notification
-
         private void OnCustomizeFastBtnClicked(object sender, EventArgs e)
         {
             Int32.TryParse(FastHoursEntry.Text, out int fastHours);
@@ -286,8 +288,8 @@ namespace IntermittentFasting
                 return;
             }
 
-            intermittentFastingPeriod = fastHours * 3600; //To seconds
-            eatingWindowPeriod = eatHours * 3600; //To seconds
+            intermittentFastingPeriod = fastHours * oneHourInSeconds; //To seconds
+            eatingWindowPeriod = eatHours * oneHourInSeconds; //To seconds
 
             SaveCustomFastingPeriod(intermittentFastingPeriod);
             SaveCustomEatingWindowPeriod(eatingWindowPeriod);
