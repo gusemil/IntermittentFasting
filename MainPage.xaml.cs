@@ -124,7 +124,7 @@ namespace IntermittentFasting
             SaveFastTime(timeWhenFastCanBeBroken);
             isFastInProgress = true;
 
-            CreateReminderNotification("Fast can be broken in one hour", "1 hour left!", oneHourLeftNotificationId, intermittentFastingPeriod - oneHourInSeconds, false);
+            if(eatingWindowPeriod > oneHourInSeconds) CreateReminderNotification("Fast can be broken in one hour", "1 hour left!", oneHourLeftNotificationId, intermittentFastingPeriod - oneHourInSeconds, false);
             CreateReminderNotification("Fast over!", "You can now break your fast!", fastOrEatingWindowNotificationId, intermittentFastingPeriod, false);
         }
 
@@ -157,7 +157,7 @@ namespace IntermittentFasting
             SaveBreakFastTime(timeWhenEatingWindowEnds);
             isEatingWindowInProgress = true;
 
-            CreateReminderNotification("Eating window is over in one hour", "1 hour left!", oneHourLeftNotificationId, eatingWindowPeriod - oneHourInSeconds, false);
+            if (intermittentFastingPeriod > oneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", oneHourLeftNotificationId, eatingWindowPeriod - oneHourInSeconds, false);
             CreateReminderNotification("Eating window over", "Start fasting!", fastOrEatingWindowNotificationId, eatingWindowPeriod, false);
         }
 
