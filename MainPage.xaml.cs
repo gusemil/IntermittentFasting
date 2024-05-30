@@ -325,9 +325,18 @@ namespace IntermittentFasting
 
         private void OnSetScheduledFasttBtnClicked(object sender, EventArgs e)
         {
+            double eatingPeriodStartTime = EatHoursStartTimePicker.Time.TotalSeconds;
+            double eatingPeriodEndTime = EatHoursEndTimePicker.Time.TotalSeconds;
+
+            int eatingPeriodTotal = Convert.ToInt32(eatingPeriodEndTime - eatingPeriodStartTime);
+
+            if(eatingPeriodTotal <= 0)
+            {
+                DisplayAlertDialog("", "Scheduled Eating Period End Time is less than Start Time", "Ok");
+                return;
+            }
             //Set eating period + repeating
-            int eatingPeriodStartTime = EatHoursStartTimePicker.Time.Seconds;
-            int eatingPeriodEndTime = EatHoursEndTimePicker.Time.Seconds;
+
             //Set fasting period + repeating
             //EatHoursEndTimePicker
         }
