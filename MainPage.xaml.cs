@@ -265,10 +265,8 @@ namespace IntermittentFasting
 
         private void OnCustomizeFastBtnClicked(object sender, EventArgs e)
         {
-            int fastHours;
-            Int32.TryParse(FastHoursEntry.Text, out fastHours);
-            int eatHours;
-            Int32.TryParse(EatHoursEntry.Text, out eatHours);
+            Int32.TryParse(FastHoursEntry.Text, out int fastHours);
+            Int32.TryParse(EatHoursEntry.Text, out int eatHours);
 
             if (fastHours <= 0)
             {
