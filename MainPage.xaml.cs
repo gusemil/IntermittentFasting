@@ -1,7 +1,5 @@
-﻿using Microsoft.Maui.Graphics.Text;
-using Plugin.LocalNotification;
+﻿using Plugin.LocalNotification;
 using Plugin.LocalNotification.AndroidOption;
-using System.Threading.Channels;
 
 namespace IntermittentFasting
 {
@@ -267,8 +265,10 @@ namespace IntermittentFasting
 
         private void OnCustomizeFastBtnClicked(object sender, EventArgs e)
         {
-            int fastHours = Int32.Parse(FastHoursEntry.Text);
-            int eatHours = Int32.Parse(EatHoursEntry.Text);
+            int fastHours;
+            Int32.TryParse(FastHoursEntry.Text, out fastHours);
+            int eatHours;
+            Int32.TryParse(EatHoursEntry.Text, out eatHours);
 
             if (fastHours <= 0)
             {
