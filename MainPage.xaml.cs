@@ -322,6 +322,15 @@ namespace IntermittentFasting
             int time = Preferences.Default.Get(CustomEatingWindowPeriodKey, DefaultEatingWindowPeriod);
             return time;
         }
+
+        private void OnSetScheduledFasttBtnClicked(object sender, EventArgs e)
+        {
+            //Set eating period + repeating
+            int eatingPeriodStartTime = EatHoursStartTimePicker.Time.Seconds;
+            int eatingPeriodEndTime = EatHoursEndTimePicker.Time.Seconds;
+            //Set fasting period + repeating
+            //EatHoursEndTimePicker
+        }
     }
 
 }
