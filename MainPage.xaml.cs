@@ -70,6 +70,11 @@ namespace IntermittentFasting
         {
             isNotificationsToggleOn = ToggleNotificationSwitch.IsToggled;
             SaveNotificationToggleState();
+            if(!isNotificationsToggleOn)
+            {
+                CancelNotification(OneHourLeftNotificationId);
+                CancelNotification(FastOrEatingWindowNotificationId);
+            }
         }
 
 
