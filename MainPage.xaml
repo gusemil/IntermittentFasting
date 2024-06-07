@@ -87,7 +87,7 @@
                 x:Name="SetScheduledFastBtn"
                 Text="Set Scheduled Fast" 
                 SemanticProperties.Hint="Set Scheduled Fast"
-                Clicked="OnSetScheduledFasttBtnClicked"
+                Clicked="OnSetScheduledFastBtnClicked"
                 HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>

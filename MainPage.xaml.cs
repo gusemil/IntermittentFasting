@@ -15,6 +15,8 @@ namespace IntermittentFasting
         private const string CustomFastingPeriodKey = "customFastingPeriodKey";
         private const string CustomEatingWindowPeriodKey = "customEatingWindowPeriodKey";
         private const string NotificationToggleKey = "notificationToggleKey";
+        private const string ScheduledEatingPeriodStartKey = "scheduledEatingPeriodStartKey";
+        private const string ScheduledEatingPeriodEndKey = "scheduledEatingPeriodEndKey";
 
         private int intermittentFastingPeriod = DefaultIntermittentFastingPeriod;
         private int eatingWindowPeriod = DefaultEatingWindowPeriod;
@@ -23,6 +25,10 @@ namespace IntermittentFasting
         private bool isFastInProgress = false;
         private bool isEatingWindowInProgress = false;
         private bool isNotificationsToggleOn = true;
+        private TimeSpan defaultScheduledEatingPeriodStart;
+        private TimeSpan defaultScheduledEatingPeriodEnd;
+        private TimeSpan scheduledEatingPeriodStart;
+        private TimeSpan scheduledEatingPeriodEnd;
 
         private Timer repeatFastTimer = null;
 
@@ -114,10 +120,10 @@ namespace IntermittentFasting
 
         private void OnFastButtonClicked(object sender, EventArgs e)
         {
-            Fast(true, false);
+            Fast(false);
         }
 
-        private void Fast(bool isManual = false, bool isScheduled = false)
+        private void Fast(bool isScheduled)
         {
             if (!isScheduled) repeatFastTimer?.Dispose();
 
@@ -143,6 +149,11 @@ namespace IntermittentFasting
             CreateReminderNotification("Fast over!", "You can now break your fast!", FastOrEatingWindowNotificationId, intermittentFastingPeriod, isScheduled);
 
             SetStartFastTexts();
+
+            if (isScheduled) 
+            {
+                //Create a eating timer and repeat it
+            }
         }
 
         private void DisplayAlertDialog(string title, string message, string cancel)
@@ -152,10 +163,10 @@ namespace IntermittentFasting
 
         private void OnBreakFastButtonClicked(object sender, EventArgs e)
         {
-            BreakFast(true, false);
+            BreakFast(false);
         }
 
-        private void BreakFast(bool isManual = false, bool isRepeating = false)
+        private void BreakFast(bool isScheduled)
         {
             if (isFastInProgress)
             {
@@ -177,11 +188,16 @@ namespace IntermittentFasting
             SaveBreakFastTime(timeWhenEatingWindowEnds);
             isEatingWindowInProgress = true;
 
-            if (intermittentFastingPeriod > OneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", OneHourLeftNotificationId, eatingWindowPeriod - OneHourInSeconds, isRepeating);
-            CreateReminderNotification("Eating window over", "Start fasting!", FastOrEatingWindowNotificationId, eatingWindowPeriod, isRepeating);
+            if (intermittentFastingPeriod > OneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", OneHourLeftNotificationId, eatingWindowPeriod - OneHourInSeconds, isScheduled);
+            CreateReminderNotification("Eating window over", "Start fasting!", FastOrEatingWindowNotificationId, eatingWindowPeriod, isScheduled);
 
             FastTimeLbl.Text = "Eating window ends: " + timeWhenEatingWindowEnds.ToString("T");
             BreakFastBtn.Text = "Click to end eating window";
+
+            if (isScheduled)
+            {
+                //Create a fasting timer
+            }
         }
 
         private void SetStartFastTexts()
@@ -292,7 +308,7 @@ namespace IntermittentFasting
 
         private void ExecuteFast(object? state)
         {
-            Fast(false,true);
+            Fast(true);
         }
 
         private void StopFastTimer()
@@ -354,7 +370,7 @@ namespace IntermittentFasting
             return time;
         }
 
-        private void OnSetScheduledFasttBtnClicked(object sender, EventArgs e)
+        private void OnSetScheduledFastBtnClicked(object sender, EventArgs e)
         {
             double eatingPeriodStartTime = EatHoursStartTimePicker.Time.TotalSeconds;
             double eatingPeriodEndTime = EatHoursEndTimePicker.Time.TotalSeconds;
@@ -371,23 +387,62 @@ namespace IntermittentFasting
                 DisplayAlertDialog("", "Set Eating period of " + EatHoursStartTimePicker.Time + " to " + EatHoursEndTimePicker.Time, "Ok");
             }
 
+            //Save Eating Period
+            SaveScheduledEatingPeriodStart(EatHoursStartTimePicker.Time);
+            SaveScheduledEatingPeriodEnd(EatHoursEndTimePicker.Time);
+
+            //Save Fasting Period
+
             //Reset All before scheduling (or not?)
             repeatFastTimer?.Dispose();
             ResetFast();
             ResetBreakFastTime();
 
             //Check whether we are fasting or eating
+            DateTime endTimeToDT = new DateTime().AddSeconds(eatingPeriodEndTime);
+            DateTime startTimeToDT = new DateTime().AddSeconds(eatingPeriodStartTime);
 
-            //Set fasting period and save it
-
-            //Create fast timer
+            if (DateTime.Now > endTimeToDT && DateTime.Now < startTimeToDT) 
+            {
+                //We are fasting
+                Fast(false);
+            }
+            else 
+            {
+                BreakFast(false);
+            }
+                //Create fast timer
             //repeatFastTimer = new Timer(ExecuteFast, null, TimeSpan.Zero, TimeSpan.FromSeconds(eatingPeriodTotal));
 
             //Set eating period and save it
+            SaveBreakFastTime(startTimeToDT);
+            SaveFastTime(endTimeToDT);
 
             //Create eating period timer
 
             //EatHoursEndTimePicker
+        }
+
+        private void SaveScheduledEatingPeriodStart(TimeSpan eatPeriodStart)
+        {
+            Preferences.Default.Set(ScheduledEatingPeriodStartKey, eatPeriodStart);
+        }
+
+        private TimeSpan GetScheduledEatingPeriodStart()
+        {
+            TimeSpan time = Preferences.Default.Get(ScheduledEatingPeriodStartKey, defaultScheduledEatingPeriodStart);
+            return time;
+        }
+
+        private void SaveScheduledEatingPeriodEnd(TimeSpan eatPeriodEnd)
+        {
+            Preferences.Default.Set(ScheduledEatingPeriodEndKey, eatPeriodEnd);
+        }
+
+        private TimeSpan GetScheduledEatingPeriodEnd()
+        {
+            TimeSpan time = Preferences.Default.Get(ScheduledEatingPeriodEndKey, defaultScheduledEatingPeriodEnd);
+            return time;
         }
     }
 
