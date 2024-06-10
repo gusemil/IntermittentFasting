@@ -124,7 +124,7 @@ namespace IntermittentFasting
             Fast(false);
         }
 
-        private void Fast(bool isScheduled, int timeModifier = 0)
+        private void Fast(bool isScheduled, int timeModifier = 0 , int fastTimeOverride = 0)
         {
             if (!isScheduled) repeatFastTimer?.Dispose();
 
@@ -141,7 +141,18 @@ namespace IntermittentFasting
                 return;
             }
 
-            int fastingPeriodInput = intermittentFastingPeriod - timeModifier;
+            int fastingPeriodInput;
+
+            if (fastTimeOverride != 0)
+            {
+                fastingPeriodInput = fastTimeOverride;
+            } 
+            else
+            {
+                fastingPeriodInput = intermittentFastingPeriod - timeModifier;
+            }
+
+
 
             timeWhenFastCanBeBroken = DateTime.Now.AddSeconds(fastingPeriodInput);
             DisplayAlertDialog("", "Fast Started! Fast can be broken " + timeWhenFastCanBeBroken.ToString("T"), "Start Fasting!");
@@ -169,7 +180,7 @@ namespace IntermittentFasting
             BreakFast(false);
         }
 
-        private void BreakFast(bool isScheduled, int timeModifier = 0)
+        private void BreakFast(bool isScheduled, int timeModifierInSeconds = 0, int eatTimeOverride = 0)
         {
             if (isFastInProgress)
             {
@@ -184,17 +195,26 @@ namespace IntermittentFasting
                 return;
             }
 
-            int modifiedEatingWindowPeriod = eatingWindowPeriod - timeModifier;
-            timeWhenEatingWindowEnds = DateTime.Now.AddSeconds(modifiedEatingWindowPeriod);
-            
+            int modifiedEatingPeriodWindow;
+
+            if(eatTimeOverride != 0)
+            {
+                modifiedEatingPeriodWindow = eatTimeOverride;
+            }
+            else
+            {
+                modifiedEatingPeriodWindow = eatingWindowPeriod - timeModifierInSeconds;
+            }
+
+            timeWhenEatingWindowEnds = DateTime.Now.AddSeconds(modifiedEatingPeriodWindow);
             //SetStartEatingWindowTexts();
 
             DisplayAlertDialog("", "Fast broken! Eating window ends " + timeWhenEatingWindowEnds.ToString("T"), "Start Eating!");
             SaveBreakFastTime(timeWhenEatingWindowEnds);
             isEatingWindowInProgress = true;
 
-            if (intermittentFastingPeriod > OneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", OneHourLeftNotificationId, modifiedEatingWindowPeriod - OneHourInSeconds, isScheduled);
-            CreateReminderNotification("Eating window over", "Start fasting!", FastOrEatingWindowNotificationId, modifiedEatingWindowPeriod, isScheduled);
+            if (intermittentFastingPeriod > OneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", OneHourLeftNotificationId, modifiedEatingPeriodWindow - OneHourInSeconds, isScheduled);
+            CreateReminderNotification("Eating window over", "Start fasting!", FastOrEatingWindowNotificationId, modifiedEatingPeriodWindow, isScheduled);
 
             FastTimeLbl.Text = "Eating window ends: " + timeWhenEatingWindowEnds.ToString("T");
             BreakFastBtn.Text = "Click to end eating window";
@@ -410,28 +430,32 @@ namespace IntermittentFasting
             DateTime endTimeToDT = new DateTime(currentTime.Year,currentTime.Month,currentTime.Day).AddSeconds(eatingPeriodEndTime);
             DateTime startTimeToDT = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day).AddSeconds(eatingPeriodStartTime);
 
-            if (DateTime.Now > startTimeToDT && DateTime.Now < endTimeToDT) 
-            {
-                //We are eating
-                BreakFast(false);
-                DisplayAlertDialog("Endtime: " + endTimeToDT, "Start time: " + startTimeToDT, "Now: " + DateTime.Now);
-            }
-            else 
-            {
-                //We are fasting
-                Fast(false);
-                DisplayAlertDialog("Endtime: " + endTimeToDT, "Start time: " + startTimeToDT, "Now: " + DateTime.Now);
-            }
-                //Create fast timer
-            //repeatFastTimer = new Timer(ExecuteFast, null, TimeSpan.Zero, TimeSpan.FromSeconds(eatingPeriodTotal));
-
             //Set eating period and save it
             SaveBreakFastTime(startTimeToDT);
             SaveFastTime(endTimeToDT);
 
-            //Create eating period timer
+            //Start eat or fast based on current time
+            if (DateTime.Now > startTimeToDT && DateTime.Now < endTimeToDT) 
+            {
+                //Calculate difference between End and current time
+                TimeSpan difference = endTimeToDT - DateTime.Now;
+                //We are eating
+                BreakFast(false, 0, Convert.ToInt32(difference.TotalSeconds)); //Set eating period less than eating window
+                DisplayAlertDialog("Endtime: " + endTimeToDT, "Start time: " + difference, "Now: " + DateTime.Now);
+            }
+            else 
+            {
+                //Calculate difference between start and current time
+                TimeSpan difference = startTimeToDT - DateTime.Now;
+                //We are fasting
+                Fast(false, 0, Convert.ToInt32(difference.TotalSeconds)); //Set fasting time less than fasting window
+                DisplayAlertDialog("Endtime: " + endTimeToDT, "Start time: " + startTimeToDT, "Now: " + DateTime.Now);
+            }
 
-            //EatHoursEndTimePicker
+            //TODO: 
+            //Create fast timer
+            //repeatFastTimer = new Timer(ExecuteFast, null, TimeSpan.Zero, TimeSpan.FromSeconds(eatingPeriodTotal));
+            //Create eating period timer
         }
 
         private void SaveScheduledEatingPeriodStart(double eatPeriodStart)
