@@ -403,14 +403,18 @@ namespace IntermittentFasting
             ResetFast();
             ResetBreakFastTime();
 
-            //Check whether we are fasting or eating
-            DateTime endTimeToDT = new DateTime().AddSeconds(eatingPeriodEndTime); //FIXME: wrong year and day
-            DateTime startTimeToDT = new DateTime().AddSeconds(eatingPeriodStartTime); //FIXME: Wrong year and day
+            //Add current time
+            DateTime currentTime = DateTime.Now;
 
-            if ((DateTime.Now > startTimeToDT) && DateTime.Now < endTimeToDT) 
+            //Check whether we are fasting or eating
+            DateTime endTimeToDT = new DateTime(currentTime.Year,currentTime.Month,currentTime.Day).AddSeconds(eatingPeriodEndTime);
+            DateTime startTimeToDT = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day).AddSeconds(eatingPeriodStartTime);
+
+            if (DateTime.Now > startTimeToDT && DateTime.Now < endTimeToDT) 
             {
                 //We are eating
                 BreakFast(false);
+                DisplayAlertDialog("Endtime: " + endTimeToDT, "Start time: " + startTimeToDT, "Now: " + DateTime.Now);
             }
             else 
             {
