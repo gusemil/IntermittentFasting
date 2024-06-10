@@ -17,6 +17,8 @@ namespace IntermittentFasting
         private const string NotificationToggleKey = "notificationToggleKey";
         private const string ScheduledEatingPeriodStartKey = "scheduledEatingPeriodStartKey";
         private const string ScheduledEatingPeriodEndKey = "scheduledEatingPeriodEndKey";
+        private const double defaultScheduledEatingPeriodStart = 36000;
+        private const double defaultScheduledEatingPeriodEnd = 64800;
 
         private int intermittentFastingPeriod = DefaultIntermittentFastingPeriod;
         private int eatingWindowPeriod = DefaultEatingWindowPeriod;
@@ -25,8 +27,6 @@ namespace IntermittentFasting
         private bool isFastInProgress = false;
         private bool isEatingWindowInProgress = false;
         private bool isNotificationsToggleOn = true;
-        private double defaultScheduledEatingPeriodStart;
-        private double defaultScheduledEatingPeriodEnd;
         private double scheduledEatingPeriodStart;
         private double scheduledEatingPeriodEnd;
 
@@ -71,6 +71,9 @@ namespace IntermittentFasting
                 BreakFastBtn.Text = "Click to end eating window";
             }
 
+            EatHoursStartTimePicker.Time = TimeSpan.FromSeconds(GetScheduledEatingPeriodStart());
+            EatHoursEndTimePicker.Time = TimeSpan.FromSeconds(GetScheduledEatingPeriodEnd());
+
             this.Loaded += CurrentTime;
         }
 
@@ -108,6 +111,8 @@ namespace IntermittentFasting
             {
                 TimeNowLbl.Text = "Eating time Left: " + ((DateTime.Now - timeWhenEatingWindowEnds) * -1).ToString("T");
             }
+
+            //TODO: Call breakfast and fast when needed when we are doing a scheduled fast
 
             if(DateTime.Now > timeWhenFastCanBeBroken && !isEatingWindowInProgress)
             {
@@ -441,7 +446,6 @@ namespace IntermittentFasting
                 TimeSpan difference = endTimeToDT - DateTime.Now;
                 //We are eating
                 BreakFast(false, 0, Convert.ToInt32(difference.TotalSeconds)); //Set eating period less than eating window
-                DisplayAlertDialog("Endtime: " + endTimeToDT, "Start time: " + difference, "Now: " + DateTime.Now);
             }
             else 
             {
@@ -449,8 +453,9 @@ namespace IntermittentFasting
                 TimeSpan difference = startTimeToDT - DateTime.Now;
                 //We are fasting
                 Fast(false, 0, Convert.ToInt32(difference.TotalSeconds)); //Set fasting time less than fasting window
-                DisplayAlertDialog("Endtime: " + endTimeToDT, "Start time: " + startTimeToDT, "Now: " + DateTime.Now);
             }
+
+            DisplayAlertDialog("Endtime: " + endTimeToDT, "Start time: " + startTimeToDT, "Now: " + DateTime.Now);
 
             //TODO: 
             //Create fast timer
