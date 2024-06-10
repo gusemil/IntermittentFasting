@@ -71,8 +71,11 @@ namespace IntermittentFasting
                 BreakFastBtn.Text = "Click to end eating window";
             }
 
-            EatHoursStartTimePicker.Time = TimeSpan.FromSeconds(GetScheduledEatingPeriodStart());
-            EatHoursEndTimePicker.Time = TimeSpan.FromSeconds(GetScheduledEatingPeriodEnd());
+            scheduledEatingPeriodStart = GetScheduledEatingPeriodStart();
+            scheduledEatingPeriodEnd = GetScheduledEatingPeriodEnd();
+
+            EatHoursStartTimePicker.Time = TimeSpan.FromSeconds(scheduledEatingPeriodStart);
+            EatHoursEndTimePicker.Time = TimeSpan.FromSeconds(scheduledEatingPeriodEnd);
 
             this.Loaded += CurrentTime;
         }
@@ -116,10 +119,12 @@ namespace IntermittentFasting
 
             if(DateTime.Now > timeWhenFastCanBeBroken && !isEatingWindowInProgress)
             {
+                //TODO: Don't if we schedule?
                 ResetFast();
             }
             else if(DateTime.Now > timeWhenEatingWindowEnds && !isFastInProgress)
             {
+                //TODO: Don't if we schedule?
                 ResetBreakFastTime();
             }
         }
