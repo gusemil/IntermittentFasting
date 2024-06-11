@@ -31,6 +31,7 @@ namespace IntermittentFasting
         private double scheduledEatingPeriodEnd;
 
         private Timer repeatFastTimer = null;
+        private Timer repeatBreakFastTimer = null;
 
 
         public MainPage()
@@ -136,7 +137,15 @@ namespace IntermittentFasting
 
         private void Fast(bool isScheduled, int timeModifier = 0 , int fastTimeOverride = 0)
         {
-            if (!isScheduled) repeatFastTimer?.Dispose();
+            if (!isScheduled)
+            {
+                if (!isScheduled)
+                {
+                    //FIXME: UNCOMMENT
+                        //StopBreakFastTimer();
+                        //StopFastTimer();
+                }   
+            }
 
             if (isEatingWindowInProgress && !isScheduled)
             {
@@ -176,7 +185,9 @@ namespace IntermittentFasting
 
             if (isScheduled) 
             {
+                //FIXME: UNCOMMENT
                 //Create a eating timer and repeat it
+                //repeatBreakFastTimer = new Timer(ExecuteBreakFast, null, TimeSpan.Zero, TimeSpan.FromSeconds(eatingWindowPeriod));
             }
         }
 
@@ -192,6 +203,13 @@ namespace IntermittentFasting
 
         private void BreakFast(bool isScheduled, int timeModifierInSeconds = 0, int eatTimeOverride = 0)
         {
+            if (!isScheduled)
+            {
+                //FIXME: UNCOMMENT
+                //StopBreakFastTimer();
+                //StopFastTimer();
+            }
+
             if (isFastInProgress)
             {
                 ResetFast();
@@ -231,7 +249,9 @@ namespace IntermittentFasting
 
             if (isScheduled)
             {
+                //FIXME: UNCOMMENT
                 //Create a fasting timer
+                //repeatFastTimer = new Timer(ExecuteFast, null, TimeSpan.Zero, TimeSpan.FromSeconds(intermittentFastingPeriod));
             }
         }
 
@@ -412,24 +432,26 @@ namespace IntermittentFasting
 
             int eatingPeriodTotal = Convert.ToInt32(eatingPeriodEndTime - eatingPeriodStartTime);
 
-            if(eatingPeriodTotal <= 0)
+            if (eatingPeriodTotal <= 0)
             {
                 DisplayAlertDialog("", "Scheduled Eating Period End Time is less than Start Time", "Ok");
                 return;
-            } 
+            }
             else
             {
                 DisplayAlertDialog("", "Set Eating period of " + EatHoursStartTimePicker.Time + " to " + EatHoursEndTimePicker.Time, "Ok");
             }
 
             //Save Eating Period
-            SaveScheduledEatingPeriodStart(eatingPeriodStartTime);
-            SaveScheduledEatingPeriodEnd(eatingPeriodEndTime);
+            SaveScheduledEatingPeriodStart(eatingPeriodStartTime); //FIXME: replace with custom or delete custom before this?
+            SaveScheduledEatingPeriodEnd(eatingPeriodEndTime); //FIXME: replace with custom or delete custom before this?
 
             //Save Fasting Period
 
             //Reset All before scheduling (or not?)
-            repeatFastTimer?.Dispose();
+
+            //FIXME: UNCOMMENT//StopFastTimer();
+            //FIXME: UNCOMMENT//StopBreakFastTimer();
             ResetFast();
             ResetBreakFastTime();
 
@@ -437,7 +459,7 @@ namespace IntermittentFasting
             DateTime currentTime = DateTime.Now;
 
             //Check whether we are fasting or eating
-            DateTime endTimeToDT = new DateTime(currentTime.Year,currentTime.Month,currentTime.Day).AddSeconds(eatingPeriodEndTime);
+            DateTime endTimeToDT = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day).AddSeconds(eatingPeriodEndTime);
             DateTime startTimeToDT = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day).AddSeconds(eatingPeriodStartTime);
 
             //Set eating period and save it
@@ -445,26 +467,29 @@ namespace IntermittentFasting
             SaveFastTime(endTimeToDT);
 
             //Start eat or fast based on current time
-            if (DateTime.Now > startTimeToDT && DateTime.Now < endTimeToDT) 
+            if (DateTime.Now > startTimeToDT && DateTime.Now < endTimeToDT)
             {
                 //Calculate difference between End and current time
                 TimeSpan difference = endTimeToDT - DateTime.Now;
                 //We are eating
                 BreakFast(false, 0, Convert.ToInt32(difference.TotalSeconds)); //Set eating period less than eating window
+                //Create fast timer
+                //FIXME: UNCOMMENT repeatFastTimer = new Timer(ExecuteFast, null, TimeSpan.Zero, TimeSpan.FromSeconds(difference.TotalSeconds));
             }
-            else 
+            else
             {
                 //Calculate difference between start and current time
                 TimeSpan difference = startTimeToDT - DateTime.Now;
                 //We are fasting
                 Fast(false, 0, Convert.ToInt32(difference.TotalSeconds)); //Set fasting time less than fasting window
+                                                                          //Create breakfast timer
+
+                //FIXME: UNCOMMENT repeatBreakFastTimer = new Timer(ExecuteBreakFast, null, TimeSpan.Zero, TimeSpan.FromSeconds(difference.TotalSeconds));
             }
 
             DisplayAlertDialog("Endtime: " + endTimeToDT, "Start time: " + startTimeToDT, "Now: " + DateTime.Now);
 
             //TODO: 
-            //Create fast timer
-            //repeatFastTimer = new Timer(ExecuteFast, null, TimeSpan.Zero, TimeSpan.FromSeconds(eatingPeriodTotal));
             //Create eating period timer
         }
 
@@ -488,6 +513,11 @@ namespace IntermittentFasting
         {
             double time = Preferences.Default.Get(ScheduledEatingPeriodEndKey, defaultScheduledEatingPeriodEnd);
             return time;
+        }
+
+        private void StopBreakFastTimer()
+        {
+            repeatBreakFastTimer.Dispose();
         }
     }
 
