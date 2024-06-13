@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="IntermittentFasting.Settings"
+             x:Class="IntermittentFasting.SettingsPage"
              Title="Settings">
     <VerticalStackLayout>
         <Label 
-            Text="Settings"
+            Text="SettingsPage"
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
+
+        <Label
+                Text="Notifications"
+                Style="{StaticResource SubHeadline}"
+                FontSize="22"
+                HorizontalOptions="Center"
+                x:Name="ToggleNotificationLbl"/>
+
+        <Switch
+                 Toggled="OnNotificationsToggled"
+                 HorizontalOptions="Center"
+                 x:Name="ToggleNotificationSwitch"/>
 
         <Button 
                  Text="Back to Main Menu"

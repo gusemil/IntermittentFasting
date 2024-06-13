@@ -7,7 +7,7 @@
             InitializeComponent();
 
             MainPage = new AppShell();
-            Routing.RegisterRoute(nameof(Settings), typeof(Settings));
+            Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));
         }
     }
 }

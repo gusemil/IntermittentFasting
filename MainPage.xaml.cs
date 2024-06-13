@@ -10,11 +10,8 @@ namespace IntermittentFasting
         private const int OneHourInSeconds = 3600;
         private const string FastTimeKey = "fastTimeKey";
         private const string BreakFastTimeKey = "breakFastTimeKey";
-        private const int FastOrEatingWindowNotificationId = 1337;
-        private const int OneHourLeftNotificationId = 420;
         private const string CustomFastingPeriodKey = "customFastingPeriodKey";
         private const string CustomEatingWindowPeriodKey = "customEatingWindowPeriodKey";
-        private const string NotificationToggleKey = "notificationToggleKey";
 
         private int intermittentFastingPeriod = DefaultIntermittentFastingPeriod;
         private int eatingWindowPeriod = DefaultEatingWindowPeriod;
@@ -22,7 +19,7 @@ namespace IntermittentFasting
         private DateTime timeWhenEatingWindowEnds;
         private bool isFastInProgress = false;
         private bool isEatingWindowInProgress = false;
-        private bool isNotificationsToggleOn = true;
+        private Settings settings = Settings.Default;
 
 
         public MainPage()
@@ -38,9 +35,6 @@ namespace IntermittentFasting
             FastHoursEntry.Text = (intermittentFastingPeriod / OneHourInSeconds).ToString();
             EatHoursEntry.Text = (eatingWindowPeriod / OneHourInSeconds).ToString();
 
-            isNotificationsToggleOn = GetNotificationToggleState();
-
-            ToggleNotificationSwitch.IsToggled = isNotificationsToggleOn;
 
             if (DateTime.Now > timeWhenFastCanBeBroken && isFastInProgress)
             {
@@ -65,18 +59,6 @@ namespace IntermittentFasting
 
             this.Loaded += CurrentTime;
         }
-
-        private void OnNotificationsToggled(object sender, EventArgs e)
-        {
-            isNotificationsToggleOn = ToggleNotificationSwitch.IsToggled;
-            SaveNotificationToggleState();
-            if(!isNotificationsToggleOn)
-            {
-                CancelNotification(OneHourLeftNotificationId);
-                CancelNotification(FastOrEatingWindowNotificationId);
-            }
-        }
-
 
         private void CurrentTime(object sender, EventArgs e)
         {
@@ -130,8 +112,8 @@ namespace IntermittentFasting
             SaveFastTime(timeWhenFastCanBeBroken);
             isFastInProgress = true;
 
-            if(eatingWindowPeriod > OneHourInSeconds) CreateReminderNotification("Fast can be broken in one hour", "1 hour left!", OneHourLeftNotificationId, intermittentFastingPeriod - OneHourInSeconds, false);
-            CreateReminderNotification("Fast over!", "You can now break your fast!", FastOrEatingWindowNotificationId, intermittentFastingPeriod, false);
+            if(eatingWindowPeriod > OneHourInSeconds) CreateReminderNotification("Fast can be broken in one hour", "1 hour left!", settings.OneHourLeftNotificationId, intermittentFastingPeriod - OneHourInSeconds, false);
+            CreateReminderNotification("Fast over!", "You can now break your fast!", settings.FastOrEatingWindowNotificationId, intermittentFastingPeriod, false);
 
             SetStartFastTexts();
         }
@@ -163,8 +145,8 @@ namespace IntermittentFasting
             SaveBreakFastTime(timeWhenEatingWindowEnds);
             isEatingWindowInProgress = true;
 
-            if (intermittentFastingPeriod > OneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", OneHourLeftNotificationId, eatingWindowPeriod - OneHourInSeconds, false);
-            CreateReminderNotification("Eating window over", "Start fasting!", FastOrEatingWindowNotificationId, eatingWindowPeriod, false);
+            if (intermittentFastingPeriod > OneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", settings.OneHourLeftNotificationId, eatingWindowPeriod - OneHourInSeconds, false);
+            CreateReminderNotification("Eating window over", "Start fasting!", settings.FastOrEatingWindowNotificationId, eatingWindowPeriod, false);
 
             FastTimeLbl.Text = "Eating window ends: " + timeWhenEatingWindowEnds.ToString("T");
             BreakFastBtn.Text = "Click to end eating window";
@@ -200,24 +182,7 @@ namespace IntermittentFasting
             SetResetFastTexts();
             isFastInProgress = false;
 
-            CancelNotification(FastOrEatingWindowNotificationId);
-            CancelNotification(OneHourLeftNotificationId);
-        }
-        
-        private void CancelNotification(int id)
-        {
-            LocalNotificationCenter.Current.Cancel(id);
-        }
-
-        private void SaveNotificationToggleState()
-        {
-            Preferences.Default.Set(NotificationToggleKey, isNotificationsToggleOn);
-        }
-
-        private bool GetNotificationToggleState()
-        {
-            bool state = Preferences.Default.Get(NotificationToggleKey, isNotificationsToggleOn);
-            return state;
+            settings.CancelNotifications();
         }
 
         private void SaveBreakFastTime(DateTime fastTime)
@@ -240,13 +205,12 @@ namespace IntermittentFasting
             FastTimeLbl.Text = "Click to start fast";
             BreakFastBtn.Text = "Click to start eating window";
 
-            CancelNotification(OneHourLeftNotificationId);
-            CancelNotification(FastOrEatingWindowNotificationId);
+            settings.CancelNotifications();
         }
 
         private void CreateReminderNotification(string title, string subtitle, int notificationId, int notificationDelayInSeconds, bool isRepeating)
         {
-            if (!isNotificationsToggleOn) return;
+            if (!settings.IsNotificationToggleOn) return;
 
             NotificationRequest request = new NotificationRequest()
             {
@@ -330,7 +294,7 @@ namespace IntermittentFasting
 
         private void OnSettingsPageButtonClicked(object sender, EventArgs e)
         {
-            Application.Current.MainPage.Navigation.PushModalAsync(new Settings(), true);
+            Application.Current.MainPage.Navigation.PushModalAsync(new SettingsPage(), true);
         }
     }
 
