@@ -327,6 +327,11 @@ namespace IntermittentFasting
             int time = Preferences.Default.Get(CustomEatingWindowPeriodKey, DefaultEatingWindowPeriod);
             return time;
         }
+
+        private void OnSettingsPageButtonClicked(object sender, EventArgs e)
+        {
+            Application.Current.MainPage.Navigation.PushModalAsync(new Settings(), true);
+        }
     }
 
 }
