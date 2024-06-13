@@ -6,4 +6,9 @@ public partial class Settings : ContentPage
 	{
 		InitializeComponent();
 	}
+
+    private void OnToMainPageButtonClicked(object sender, EventArgs e)
+    {
+        Application.Current.MainPage.Navigation.PushModalAsync(new MainPage(), true);
+    }
 }

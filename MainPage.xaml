@@ -75,7 +75,6 @@
 
             <Button 
                  Text="Settings Page"
-                 Grid.Row="3"
                  Clicked="OnSettingsPageButtonClicked"
                  HorizontalOptions="Center" />
         </VerticalStackLayout>

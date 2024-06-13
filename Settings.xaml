@@ -8,5 +8,10 @@
             Text="Settings"
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
+
+        <Button 
+                 Text="Back to Main Menu"
+                 Clicked="OnToMainPageButtonClicked"
+                 HorizontalOptions="Center" />
     </VerticalStackLayout>
 </ContentPage>
