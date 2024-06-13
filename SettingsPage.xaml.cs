@@ -58,6 +58,14 @@ public partial class SettingsPage : ContentPage
         settings.DisplayAlertDialog("", "Set custom fast of " + fastHours + " fasting hours with an eating window of " + eatHours + " hours. Aka a " + fastHours + ":" + eatHours + " fast", "Ok");
     }
 
+    private void OnResetAllSettingsClicked(object sender, EventArgs e)
+    {
+        FastHoursEntry.Text = settings.DefaultIntermittentFastingPeriodInHours.ToString();
+        EatHoursEntry.Text = settings.DefaultEatingWindowPeriodInHours.ToString();
+        if(!ToggleNotificationSwitch.IsToggled) ToggleNotificationSwitch.IsToggled = true;
+        settings.ResetAllSettings();
+    }
+
     private void OnToMainPageButtonClicked(object sender, EventArgs e)
     {
         Application.Current.MainPage.Navigation.PushModalAsync(new MainPage(), true);

@@ -3,46 +3,56 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="IntermittentFasting.SettingsPage"
              Title="Settings">
-    <VerticalStackLayout>
-        <Label 
-            Text="SettingsPage"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
 
-        <Label
-                Text="Notifications"
-                Style="{StaticResource SubHeadline}"
-                FontSize="22"
-                HorizontalOptions="Center"
-                x:Name="ToggleNotificationLbl"/>
+    <ScrollView>
+            <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Label 
+                Text="SettingsPage"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
 
-        <Switch
-                 Toggled="OnNotificationsToggled"
-                 HorizontalOptions="Center"
-                 x:Name="ToggleNotificationSwitch"/>
+            <Label
+                    Text="Notifications"
+                    Style="{StaticResource SubHeadline}"
+                    FontSize="22"
+                    HorizontalOptions="Center"
+                    x:Name="ToggleNotificationLbl"/>
 
-        <Entry
-                x:Name="FastHoursEntry"
-                Text="16"
-                Keyboard="Numeric"
-                MaxLength="2"/>
+            <Switch
+                     Toggled="OnNotificationsToggled"
+                     HorizontalOptions="Center"
+                     x:Name="ToggleNotificationSwitch"/>
 
-        <Entry
-               x:Name="EatHoursEntry"
-               Text="8"
-               Keyboard="Numeric"
-               MaxLength="2"/>
+            <Entry
+                    x:Name="FastHoursEntry"
+                    Text="16"
+                    Keyboard="Numeric"
+                    MaxLength="2"/>
 
-        <Button
-                x:Name="CustomizeFastBtn"
-                Text="Set Custom Fast" 
-                SemanticProperties.Hint="Set Custom Fast"
-                Clicked="OnCustomizeFastBtnClicked"
-                HorizontalOptions="Fill" />
+            <Entry
+                   x:Name="EatHoursEntry"
+                   Text="8"
+                   Keyboard="Numeric"
+                   MaxLength="2"/>
 
-        <Button 
-                 Text="Back to Main Menu"
-                 Clicked="OnToMainPageButtonClicked"
-                 HorizontalOptions="Center" />
-    </VerticalStackLayout>
+            <Button
+                    x:Name="CustomizeFastBtn"
+                    Text="Set Custom Fast" 
+                    SemanticProperties.Hint="Set Custom Fast"
+                    Clicked="OnCustomizeFastBtnClicked"
+                    HorizontalOptions="Fill" />
+
+            <Button 
+                     Text="Reset All Settings"
+                     Clicked="OnResetAllSettingsClicked"
+                     HorizontalOptions="Center" />
+
+            <Button 
+                     Text="Back to Main Menu"
+                     Clicked="OnToMainPageButtonClicked"
+                     HorizontalOptions="Center" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
