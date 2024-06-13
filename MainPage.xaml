@@ -74,21 +74,6 @@
                 SemanticProperties.Hint="Set Custom Fast"
                 Clicked="OnCustomizeFastBtnClicked"
                 HorizontalOptions="Fill" />
-
-            <TimePicker 
-                Time="10:00"
-                x:Name="EatHoursStartTimePicker"/>
-
-            <TimePicker 
-                Time="18:00"
-                x:Name="EatHoursEndTimePicker"/>
-
-            <Button
-                x:Name="SetScheduledFastBtn"
-                Text="Set Scheduled Fast" 
-                SemanticProperties.Hint="Set Scheduled Fast"
-                Clicked="OnSetScheduledFasttBtnClicked"
-                HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>
 
