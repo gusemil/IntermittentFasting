@@ -21,6 +21,25 @@
                  HorizontalOptions="Center"
                  x:Name="ToggleNotificationSwitch"/>
 
+        <Entry
+                x:Name="FastHoursEntry"
+                Text="16"
+                Keyboard="Numeric"
+                MaxLength="2"/>
+
+        <Entry
+               x:Name="EatHoursEntry"
+               Text="8"
+               Keyboard="Numeric"
+               MaxLength="2"/>
+
+        <Button
+                x:Name="CustomizeFastBtn"
+                Text="Set Custom Fast" 
+                SemanticProperties.Hint="Set Custom Fast"
+                Clicked="OnCustomizeFastBtnClicked"
+                HorizontalOptions="Fill" />
+
         <Button 
                  Text="Back to Main Menu"
                  Clicked="OnToMainPageButtonClicked"

@@ -12,8 +12,15 @@ namespace IntermittentFasting
         public static Settings Default { get; set; } = new Settings();
         public bool IsNotificationToggleOn { get; set; }
         private const string notificationToggleKey = "notificationToggleKey";
+        private const int DefaultIntermittentFastingPeriod = 57600; //57600 seconds -> 16 hours
+        private const int DefaultEatingWindowPeriod = 28800; //28800 seconds -> 8 hours
+        public const string CustomFastingPeriodKey = "customFastingPeriodKey";
+        public const string CustomEatingWindowPeriodKey = "customEatingWindowPeriodKey";
         public int FastOrEatingWindowNotificationId = 1337;
         public int OneHourLeftNotificationId = 420;
+        public int intermittentFastingPeriod = DefaultIntermittentFastingPeriod;
+        public int eatingWindowPeriod = DefaultEatingWindowPeriod;
+        public int OneHourInSeconds = 3600;
         public Settings()
         {
             IsNotificationToggleOn = GetNotificationToggleState();
@@ -30,6 +37,11 @@ namespace IntermittentFasting
             return state;
         }
 
+        public void DisplayAlertDialog(string title, string message, string cancel)
+        {
+            Application.Current.MainPage.DisplayAlert(title, message, cancel);
+        }
+
         public void CancelNotifications()
         {
             CancelNotification(FastOrEatingWindowNotificationId);
@@ -39,6 +51,28 @@ namespace IntermittentFasting
         private void CancelNotification(int id)
         {
             LocalNotificationCenter.Current.Cancel(id);
+        }
+
+        public void SaveCustomFastingPeriod(int fastPeriod)
+        {
+            Preferences.Default.Set(CustomFastingPeriodKey, fastPeriod);
+        }
+
+        public int GetCustomFastingPeriod()
+        {
+            int time = Preferences.Default.Get(CustomFastingPeriodKey, DefaultIntermittentFastingPeriod);
+            return time;
+        }
+
+        public void SaveCustomEatingWindowPeriod(int eatPeriod)
+        {
+            Preferences.Default.Set(CustomEatingWindowPeriodKey, eatPeriod);
+        }
+
+        public int GetCustomEatingWindowPeriod()
+        {
+            int time = Preferences.Default.Get(CustomEatingWindowPeriodKey, DefaultEatingWindowPeriod);
+            return time;
         }
 
     }

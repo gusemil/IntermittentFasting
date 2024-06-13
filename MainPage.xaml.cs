@@ -5,16 +5,9 @@ namespace IntermittentFasting
 {
     public partial class MainPage : ContentPage
     {
-        private const int DefaultIntermittentFastingPeriod = 57600; //57600 seconds -> 16 hours
-        private const int DefaultEatingWindowPeriod = 28800; //28800 seconds -> 8 hours
-        private const int OneHourInSeconds = 3600;
         private const string FastTimeKey = "fastTimeKey";
         private const string BreakFastTimeKey = "breakFastTimeKey";
-        private const string CustomFastingPeriodKey = "customFastingPeriodKey";
-        private const string CustomEatingWindowPeriodKey = "customEatingWindowPeriodKey";
 
-        private int intermittentFastingPeriod = DefaultIntermittentFastingPeriod;
-        private int eatingWindowPeriod = DefaultEatingWindowPeriod;
         private DateTime timeWhenFastCanBeBroken;
         private DateTime timeWhenEatingWindowEnds;
         private bool isFastInProgress = false;
@@ -29,11 +22,6 @@ namespace IntermittentFasting
 
             timeWhenFastCanBeBroken = GetFastTime();
             timeWhenEatingWindowEnds = GetBreakFastTime();
-            intermittentFastingPeriod = GetCustomFastingPeriod();
-            eatingWindowPeriod = GetCustomEatingWindowPeriod();
-
-            FastHoursEntry.Text = (intermittentFastingPeriod / OneHourInSeconds).ToString();
-            EatHoursEntry.Text = (eatingWindowPeriod / OneHourInSeconds).ToString();
 
 
             if (DateTime.Now > timeWhenFastCanBeBroken && isFastInProgress)
@@ -97,30 +85,25 @@ namespace IntermittentFasting
             if (isEatingWindowInProgress)
             {
                 ResetBreakFastTime();
-                DisplayAlertDialog("", "Eating window has been reset!", "Ok");
+                settings.DisplayAlertDialog("", "Eating window has been reset!", "Ok");
                 return;
             }
             else if(isFastInProgress)
             {
                 ResetFast();
-                DisplayAlertDialog("", "Fast has been reset!", "Start Fasting!");
+                settings.DisplayAlertDialog("", "Fast has been reset!", "Start Fasting!");
                 return;
             }
 
-            timeWhenFastCanBeBroken = DateTime.Now.AddSeconds(intermittentFastingPeriod);
-            DisplayAlertDialog("", "Fast Started! Fast can be broken " + timeWhenFastCanBeBroken.ToString("T"), "Start Fasting!");
+            timeWhenFastCanBeBroken = DateTime.Now.AddSeconds(settings.intermittentFastingPeriod);
+            settings.DisplayAlertDialog("", "Fast Started! Fast can be broken " + timeWhenFastCanBeBroken.ToString("T"), "Start Fasting!");
             SaveFastTime(timeWhenFastCanBeBroken);
             isFastInProgress = true;
 
-            if(eatingWindowPeriod > OneHourInSeconds) CreateReminderNotification("Fast can be broken in one hour", "1 hour left!", settings.OneHourLeftNotificationId, intermittentFastingPeriod - OneHourInSeconds, false);
-            CreateReminderNotification("Fast over!", "You can now break your fast!", settings.FastOrEatingWindowNotificationId, intermittentFastingPeriod, false);
+            if(settings.eatingWindowPeriod > settings.OneHourInSeconds) CreateReminderNotification("Fast can be broken in one hour", "1 hour left!", settings.OneHourLeftNotificationId, settings.intermittentFastingPeriod - settings.OneHourInSeconds, false);
+            CreateReminderNotification("Fast over!", "You can now break your fast!", settings.FastOrEatingWindowNotificationId, settings.intermittentFastingPeriod, false);
 
             SetStartFastTexts();
-        }
-
-        private void DisplayAlertDialog(string title, string message, string cancel)
-        {
-            Application.Current.MainPage.DisplayAlert(title, message, cancel);
         }
 
         private void OnBreakFastButtonClicked(object sender, EventArgs e)
@@ -128,25 +111,25 @@ namespace IntermittentFasting
             if (isFastInProgress)
             {
                 ResetFast();
-                DisplayAlertDialog("", "Fast has been reset!", "Start Fasting!");
+                settings.DisplayAlertDialog("", "Fast has been reset!", "Start Fasting!");
                 return;
             }
             else if (isEatingWindowInProgress)
             {
                 ResetBreakFastTime();
-                DisplayAlertDialog("", "Eating window has been reset!", "Ok");
+                settings.DisplayAlertDialog("", "Eating window has been reset!", "Ok");
                 return;
             }
 
-            timeWhenEatingWindowEnds = DateTime.Now.AddSeconds(eatingWindowPeriod);
+            timeWhenEatingWindowEnds = DateTime.Now.AddSeconds(settings.eatingWindowPeriod);
             //SetStartEatingWindowTexts();
 
-            DisplayAlertDialog("", "Fast broken! Eating window ends " + timeWhenEatingWindowEnds.ToString("T"), "Start Eating!");
+            settings.DisplayAlertDialog("", "Fast broken! Eating window ends " + timeWhenEatingWindowEnds.ToString("T"), "Start Eating!");
             SaveBreakFastTime(timeWhenEatingWindowEnds);
             isEatingWindowInProgress = true;
 
-            if (intermittentFastingPeriod > OneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", settings.OneHourLeftNotificationId, eatingWindowPeriod - OneHourInSeconds, false);
-            CreateReminderNotification("Eating window over", "Start fasting!", settings.FastOrEatingWindowNotificationId, eatingWindowPeriod, false);
+            if (settings.intermittentFastingPeriod > settings.OneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", settings.OneHourLeftNotificationId, settings.eatingWindowPeriod - settings.OneHourInSeconds, false);
+            CreateReminderNotification("Eating window over", "Start fasting!", settings.FastOrEatingWindowNotificationId, settings.eatingWindowPeriod, false);
 
             FastTimeLbl.Text = "Eating window ends: " + timeWhenEatingWindowEnds.ToString("T");
             BreakFastBtn.Text = "Click to end eating window";
@@ -236,60 +219,6 @@ namespace IntermittentFasting
             }
 
             LocalNotificationCenter.Current.Show(request);
-        }
-
-        private void OnCustomizeFastBtnClicked(object sender, EventArgs e)
-        {
-            Int32.TryParse(FastHoursEntry.Text, out int fastHours);
-            Int32.TryParse(EatHoursEntry.Text, out int eatHours);
-
-            if (fastHours <= 0)
-            {
-                DisplayAlertDialog("","Invalid Fasting hours input","Ok");
-                return;
-            }
-
-            if(eatHours <= 0)
-            {
-                DisplayAlertDialog("", "Invalid Eating period input", "Ok");
-                return;
-            }
-
-            if ((fastHours + eatHours) != 24)
-            {
-                DisplayAlertDialog("", "Invalid hours in a day inserted", "Ok");
-                return;
-            }
-
-            intermittentFastingPeriod = fastHours * OneHourInSeconds; //To seconds
-            eatingWindowPeriod = eatHours * OneHourInSeconds; //To seconds
-
-            SaveCustomFastingPeriod(intermittentFastingPeriod);
-            SaveCustomEatingWindowPeriod(eatingWindowPeriod);
-
-            DisplayAlertDialog("", "Set custom fast of " + fastHours + " fasting hours with an eating window of " + eatHours + " hours. Aka a " + fastHours + ":" + eatHours + " fast", "Ok");
-        }
-
-        private void SaveCustomFastingPeriod(int fastPeriod)
-        {
-            Preferences.Default.Set(CustomFastingPeriodKey, fastPeriod);
-        }
-
-        private int GetCustomFastingPeriod()
-        {
-            int time = Preferences.Default.Get(CustomFastingPeriodKey, DefaultIntermittentFastingPeriod);
-            return time;
-        }
-
-        private void SaveCustomEatingWindowPeriod(int eatPeriod)
-        {
-            Preferences.Default.Set(CustomEatingWindowPeriodKey, eatPeriod);
-        }
-
-        private int GetCustomEatingWindowPeriod()
-        {
-            int time = Preferences.Default.Get(CustomEatingWindowPeriodKey, DefaultEatingWindowPeriod);
-            return time;
         }
 
         private void OnSettingsPageButtonClicked(object sender, EventArgs e)
