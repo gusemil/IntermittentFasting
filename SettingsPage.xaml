@@ -10,32 +10,64 @@
             Spacing="25">
             <Label 
                 Text="SettingsPage"
+                FontSize="22"
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" />
 
-            <Label
+            <HorizontalStackLayout
+                Padding="30,0"
+                Spacing="25"
+                HorizontalOptions="Center">
+
+                <Label
                     Text="Notifications"
                     Style="{StaticResource SubHeadline}"
                     FontSize="22"
                     HorizontalOptions="Center"
                     x:Name="ToggleNotificationLbl"/>
 
-            <Switch
+                <Switch
                      Toggled="OnNotificationsToggled"
                      HorizontalOptions="Center"
                      x:Name="ToggleNotificationSwitch"/>
+            </HorizontalStackLayout>
 
-            <Entry
+
+            <HorizontalStackLayout
+                Padding="30,0"
+                Spacing="25"
+                HorizontalOptions="Center">
+
+                <Label 
+                Text="Fasting window in hours:"
+                FontSize="22"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+
+                <Entry
                     x:Name="FastHoursEntry"
                     Text="16"
                     Keyboard="Numeric"
                     MaxLength="2"/>
+            </HorizontalStackLayout>
 
-            <Entry
+            <HorizontalStackLayout
+                Padding="30,0"
+                Spacing="25"
+                HorizontalOptions="Center">
+
+                <Label 
+                Text="Eating window in hours:"
+                FontSize="22"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+
+                <Entry
                    x:Name="EatHoursEntry"
                    Text="8"
                    Keyboard="Numeric"
                    MaxLength="2"/>
+            </HorizontalStackLayout>
 
             <Button
                     x:Name="CustomizeFastBtn"
