@@ -20,43 +20,29 @@ namespace IntermittentFasting
             fastInProgress = settings.GetFastInProgress();
             eatingWindowInProgress = settings.GetBreakFastInProgress();
 
-            //FIXME: Fix the mess here
-
             if (DateTime.Now > settings.timeWhenFastCanBeBroken && fastInProgress)
             {
                 //We have exceeded the fast window. Lets stop it
                 settings.ResetFast();
-            }
-            //TODO: Else set texts properly if fast is in progress
-
-            /*
-            else if(!settings.isEatingWindowInProgress || settings.timeWhenFastCanBeBroken.Second < 0)
+            } 
+            else if(fastInProgress)
             {
-                settings.isFastInProgress = true;
-                SetStartFastTexts();
+                SetFastOnGoingTexts();
             }
-            */
 
             if(DateTime.Now > settings.timeWhenEatingWindowEnds && eatingWindowInProgress)
             {
                 //We have exceeded the eating window. Lets stop it
                 settings.ResetBreakFastTime();
             }
-            //TODO: Else set texts properly if eating is is progress
-
-            /*
-            else if (!settings.isFastInProgress || settings.timeWhenEatingWindowEnds.Second > 0)
-            {
-                settings.isEatingWindowInProgress = true;
-                FastTimeLbl.Text = "Eating window ends: " + settings.timeWhenEatingWindowEnds.ToString("T");
-                BreakFastBtn.Text = "Click to end eating window";
+            else if(eatingWindowInProgress)
+            {s
+                SetEatingWindowOnGoingTexts();
             }
-            */
 
             if (!fastInProgress && !eatingWindowInProgress)
             {
-                FastTimerBtn.Text = "Click to start fast";
-                BreakFastBtn.Text = "Click to break fast";
+                SetDefaultTexts();
             }
 
             this.Loaded += CurrentTime;
@@ -101,8 +87,7 @@ namespace IntermittentFasting
                 eatingWindowInProgress = false;
                 settings.ResetBreakFastTime();
                 settings.DisplayAlertDialog("", "Eating window has been reset!", "Ok");
-                FastTimerBtn.Text = "Click to start fast";
-                BreakFastBtn.Text = "Click to break fast";
+                SetDefaultTexts();
                 return;
             }
             else if(fastInProgress)
@@ -110,8 +95,7 @@ namespace IntermittentFasting
                 fastInProgress = false;
                 settings.ResetFast();
                 settings.DisplayAlertDialog("", "Fast has been reset!", "Start Fasting!");
-                FastTimerBtn.Text = "Click to start fast";
-                BreakFastBtn.Text = "Click to break fast";
+                SetDefaultTexts();
                 return;
             }
 
@@ -124,7 +108,7 @@ namespace IntermittentFasting
             if (settings.eatingWindowPeriod > settings.OneHourInSeconds) CreateReminderNotification("Fast can be broken in one hour", "1 hour left!", settings.OneHourLeftNotificationId, settings.intermittentFastingPeriod - settings.OneHourInSeconds, false);
             CreateReminderNotification("Fast over!", "You can now break your fast!", settings.FastOrEatingWindowNotificationId, settings.intermittentFastingPeriod, false);
 
-            SetStartFastTexts();
+            SetFastOnGoingTexts();
         }
 
         private void OnBreakFastButtonClicked(object sender, EventArgs e)
@@ -135,16 +119,13 @@ namespace IntermittentFasting
                 SetResetFastTexts();
                 settings.ResetFast();
                 settings.DisplayAlertDialog("", "Fast has been reset!", "Start Fasting!");
-                FastTimerBtn.Text = "Click to start fast";
-                BreakFastBtn.Text = "Click to break fast";
+                SetDefaultTexts();
                 return;
             }
             else if (eatingWindowInProgress)
             {
                 eatingWindowInProgress = false;
-                FastTimeLbl.Text = "Click to start fast";
-                BreakFastBtn.Text = "Click to break fast";
-
+                SetDefaultTexts();
                 settings.ResetBreakFastTime();
                 settings.DisplayAlertDialog("", "Eating window has been reset!", "Ok");
                 return;
@@ -161,20 +142,31 @@ namespace IntermittentFasting
             if (settings.intermittentFastingPeriod > settings.OneHourInSeconds) CreateReminderNotification("Eating window is over in one hour", "1 hour left!", settings.OneHourLeftNotificationId, settings.eatingWindowPeriod - settings.OneHourInSeconds, false);
             CreateReminderNotification("Eating window over", "Start fasting!", settings.FastOrEatingWindowNotificationId, settings.eatingWindowPeriod, false);
 
-            FastTimeLbl.Text = "Eating window ends: " + settings.timeWhenEatingWindowEnds.ToString("T");
-            BreakFastBtn.Text = "Click to end eating window";
+            SetEatingWindowOnGoingTexts();
         }
 
-        private void SetStartFastTexts()
+        private void SetFastOnGoingTexts()
         {
             FastTimeLbl.Text = "Fast can be broken: " + settings.timeWhenFastCanBeBroken.ToString("T");
             FastTimerBtn.Text = "Click to reset fast";
+        }
+
+        private void SetEatingWindowOnGoingTexts()
+        {
+            FastTimeLbl.Text = "Eating window ends: " + settings.timeWhenEatingWindowEnds.ToString("T");
+            BreakFastBtn.Text = "Click to end eating window";
         }
         
         private void SetResetFastTexts()
         {
             FastTimeLbl.Text = "Click to Start Fasting!";
             FastTimerBtn.Text = "Start fast";
+        }
+
+        private void SetDefaultTexts()
+        {
+            FastTimerBtn.Text = "Click to start fast";
+            BreakFastBtn.Text = "Click to break fast";
         }
 
         private void CreateReminderNotification(string title, string subtitle, int notificationId, int notificationDelayInSeconds, bool isRepeating)
