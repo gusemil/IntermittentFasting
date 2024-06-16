@@ -64,6 +64,7 @@ namespace IntermittentFasting
             if (!fastInProgress && !eatingWindowInProgress)
             {
                 TimeNowLbl.Text = TimeNowLbl.Text = "Current Time: " + DateTime.Now.ToString("T");
+                FastTimeLbl.Text = "Click to Start Fasting!";
                 return;
             }
 
@@ -166,11 +167,13 @@ namespace IntermittentFasting
         private void SetResetFastTexts()
         {
             FastTimeLbl.Text = "Click to Start Fasting!";
+            FastTimeLbl.Text = "Click to Start Fasting!";
             FastTimerBtn.Text = "Start fast";
         }
 
         private void SetDefaultTexts()
         {
+            FastTimeLbl.Text = "Click to Start Fasting!";
             FastTimerBtn.Text = "Click to start fast";
             BreakFastBtn.Text = "Click to break fast";
         }
