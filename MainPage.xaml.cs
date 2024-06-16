@@ -36,7 +36,7 @@ namespace IntermittentFasting
                 settings.ResetBreakFastTime();
             }
             else if(eatingWindowInProgress)
-            {s
+            {
                 SetEatingWindowOnGoingTexts();
             }
 
@@ -61,7 +61,13 @@ namespace IntermittentFasting
 
         private void CheckTime()
         {
-            if(fastInProgress && ((DateTime.Now - settings.timeWhenFastCanBeBroken).TotalSeconds < 0)) 
+            if (!fastInProgress && !eatingWindowInProgress)
+            {
+                TimeNowLbl.Text = TimeNowLbl.Text = "Current Time: " + DateTime.Now.ToString("T");
+                return;
+            }
+
+            if (fastInProgress && ((DateTime.Now - settings.timeWhenFastCanBeBroken).TotalSeconds < 0)) 
             {
                 TimeNowLbl.Text = "Fasting Time Left: " + ((DateTime.Now - settings.timeWhenFastCanBeBroken) * -1).ToString("T");
             }

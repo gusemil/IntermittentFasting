@@ -64,6 +64,7 @@ public partial class SettingsPage : ContentPage
         EatHoursEntry.Text = settings.DefaultEatingWindowPeriodInHours.ToString();
         if(!ToggleNotificationSwitch.IsToggled) ToggleNotificationSwitch.IsToggled = true;
         settings.ResetAllSettings();
+        settings.DisplayAlertDialog("", "Reset all settings", "Ok");
     }
 
     private void OnToMainPageButtonClicked(object sender, EventArgs e)
