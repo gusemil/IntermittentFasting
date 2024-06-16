@@ -23,13 +23,15 @@ namespace IntermittentFasting
         public const string CustomEatingWindowPeriodKey = "customEatingWindowPeriodKey";
         private const string FastTimeKey = "fastTimeKey";
         private const string BreakFastTimeKey = "breakFastTimeKey";
+        private const string FastInProgressKey = "fastInProgressKey";
+        private const string BreakFastInProgressKey = "breakfastInProgressKey";
         public int FastOrEatingWindowNotificationId = 1337;
         public int OneHourLeftNotificationId = 420;
         public int intermittentFastingPeriod = DefaultIntermittentFastingPeriod;
         public int eatingWindowPeriod = DefaultEatingWindowPeriod;
         public int OneHourInSeconds = 3600;
-        public bool isFastInProgress = false;
-        public bool isEatingWindowInProgress = false;
+        private bool isFastInProgress = false;
+        private bool isEatingWindowInProgress = false;
         public Settings()
         {
             IsNotificationToggleOn = GetNotificationToggleState();
@@ -110,6 +112,7 @@ namespace IntermittentFasting
         public void ResetFast()
         {
             Preferences.Default.Remove(FastTimeKey);
+            RemoveFastInProgressKey();
 
             isFastInProgress = false;
 
@@ -119,6 +122,7 @@ namespace IntermittentFasting
         public void ResetBreakFastTime()
         {
             Preferences.Default.Remove(BreakFastTimeKey);
+            RemoveBreakFastInProgressKey();
 
             isEatingWindowInProgress = false;
 
@@ -134,11 +138,45 @@ namespace IntermittentFasting
             Preferences.Default.Remove(CustomFastingPeriodKey);
             Preferences.Default.Remove(CustomEatingWindowPeriodKey);
             Preferences.Default.Remove(notificationToggleKey);
+            RemoveBreakFastInProgressKey();
+            RemoveFastInProgressKey();
 
             isEatingWindowInProgress = false;
             isFastInProgress = false;
 
             CancelNotifications();
+        }
+
+        public void SaveBreakFastInProgress(bool state)
+        {
+            Preferences.Default.Set(BreakFastInProgressKey, state);
+        }
+
+        public bool GetBreakFastInProgress()
+        {
+            bool state = Preferences.Default.Get(BreakFastInProgressKey, isEatingWindowInProgress); //or just return false as default?
+            return state;
+        }
+
+        public void RemoveBreakFastInProgressKey()
+        {
+            Preferences.Remove(BreakFastInProgressKey);
+        }
+
+        public void SaveFastInProgress(bool state)
+        {
+            Preferences.Default.Set(FastInProgressKey, state);
+        }
+
+        public bool GetFastInProgress()
+        {
+            bool state = Preferences.Default.Get(FastInProgressKey, isFastInProgress); //or just return false as default?
+            return state;
+        }
+
+        public void RemoveFastInProgressKey()
+        {
+            Preferences.Remove(FastInProgressKey);
         }
 
     }
