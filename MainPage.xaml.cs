@@ -167,14 +167,12 @@ namespace IntermittentFasting
         private void SetResetFastTexts()
         {
             FastTimeLbl.Text = "Click to Start Fasting!";
-            FastTimeLbl.Text = "Click to Start Fasting!";
-            FastTimerBtn.Text = "Start fast";
+            FastTimerBtn.Text = "Click to start fast";
         }
 
         private void SetDefaultTexts()
         {
-            FastTimeLbl.Text = "Click to Start Fasting!";
-            FastTimerBtn.Text = "Click to start fast";
+            SetResetFastTexts();
             BreakFastBtn.Text = "Click to break fast";
         }
 

@@ -35,14 +35,12 @@
 
             <HorizontalStackLayout
                 Padding="30,0"
-                Spacing="25"
+                Spacing="10"
                 HorizontalOptions="Center">
 
                 <Label 
-                Text="Fasting window in hours:"
-                FontSize="22"
-                VerticalOptions="Center" 
-                HorizontalOptions="Center" />
+                Text="Fasting Hours:"
+                FontSize="22"/>
 
                 <Entry
                     x:Name="FastHoursEntry"
@@ -53,14 +51,12 @@
 
             <HorizontalStackLayout
                 Padding="30,0"
-                Spacing="25"
+                Spacing="10"
                 HorizontalOptions="Center">
 
                 <Label 
-                Text="Eating window in hours:"
-                FontSize="22"
-                VerticalOptions="Center" 
-                HorizontalOptions="Center" />
+                Text="Eating hours:"
+                FontSize="22"/>
 
                 <Entry
                    x:Name="EatHoursEntry"
