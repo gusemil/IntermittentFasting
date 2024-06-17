@@ -16,3 +16,5 @@
 ### You can watch the demo video of the MVP below
 
 [![Watch the video](https://img.youtube.com/vi/6gBp30SZD9k/maxresdefault.jpg)](https://youtu.be/6gBp30SZD9k)
+
+https://www.youtube.com/watch?v=6gBp30SZD9k
