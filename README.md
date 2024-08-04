@@ -10,8 +10,6 @@
 - [X] MVP done
 - [ ] Make it look more professional and neat
 - [ ] Explain concepts to the user
-- [ ] iOS support?
-- [ ] Publish somewhere?
 
 ### You can watch the demo video of the MVP below
 
